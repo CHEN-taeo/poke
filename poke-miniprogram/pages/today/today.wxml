@@ -1,0 +1,39 @@
+<import src="../../templates/card.wxml" />
+
+<view class="hd">
+  <view class="brand">
+    <view class="logo">🐣</view>
+    <view>
+      <view class="title">破壳</view>
+      <view class="tag">把刷不完的群消息，变成今天值得做的 3 件事</view>
+    </view>
+  </view>
+  <view class="datebar">
+    <view class="d"><text class="b">{{dateLabel}}</text>　{{online ? '实时 · 真实 AI 数据' : '离线 · 示例数据'}}</view>
+    <view class="gear" bindtap="goForward">导入</view>
+    <view class="gear" bindtap="goOperator" style="margin-left:12rpx">运营</view>
+  </view>
+</view>
+
+<view class="wrap">
+  <block wx:if="{{normal.length || poke.length}}">
+    <view class="lead">少即是多 —— 破壳的目标不是给你<text class="em">更多</text>，而是更少、更准。今天就这几条，看完就去做点什么。</view>
+
+    <view class="sec-title"><text class="n">{{normal.length}}</text> 今日精选 · 值得做的事</view>
+    <block wx:for="{{normal}}" wx:key="id">
+      <template is="card" data="{{c: item}}" />
+    </block>
+
+    <block wx:if="{{poke.length}}">
+      <view class="sec-title">🌱 破壳一下 · 圈外的</view>
+      <block wx:for="{{poke}}" wx:key="id">
+        <template is="card" data="{{c: item}}" />
+      </block>
+    </block>
+  </block>
+
+  <view wx:else class="empty">
+    <view class="big">🐣</view>今天还没有内容
+    <view class="small">点右上角「运营」录入今天值得做的 3 件事</view>
+  </view>
+</view>

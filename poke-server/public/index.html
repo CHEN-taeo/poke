@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>破壳 · 采集管线控制台</title>
+<style>
+  :root{--bg:#0f1117;--card:#1a1d27;--card2:#222633;--line:#2c3140;--txt:#eef1f7;--sub:#9aa3b2;--mut:#6b7280;--brand:#7c5cff;--brand2:#37e0c6;--warn:#ffb454;--pink:#ff6b9d}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--txt);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}
+  header{padding:18px 22px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:14px;
+    background:radial-gradient(120% 100% at 0 0,rgba(124,92,255,.25),transparent 60%),var(--bg)}
+  .logo{width:38px;height:38px;border-radius:12px;background:linear-gradient(135deg,var(--brand),var(--brand2));display:grid;place-items:center;font-size:22px}
+  h1{font-size:19px;margin:0}
+  header .tag{font-size:12px;color:var(--sub);margin-top:2px}
+  .badge{margin-left:auto;font-size:12px;color:var(--sub);display:flex;gap:14px;align-items:center}
+  .dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--brand2);margin-right:5px}
+  .wrap{display:grid;grid-template-columns:minmax(320px,420px) 1fr;gap:0;height:calc(100vh - 75px)}
+  .left{border-right:1px solid var(--line);padding:16px;overflow-y:auto}
+  .right{padding:16px;overflow-y:auto}
+  .panel-title{font-size:13px;color:var(--sub);font-weight:600;margin:4px 0 12px;display:flex;align-items:center;gap:8px}
+  .kpis{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+  .kpi{flex:1;min-width:84px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px}
+  .kpi .v{font-size:22px;font-weight:800;color:var(--brand2)}
+  .kpi .l{font-size:11px;color:var(--sub);margin-top:2px}
+  .controls{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+  button{border:none;border-radius:10px;padding:10px 14px;font-size:13px;font-weight:600;cursor:pointer;background:var(--card2);color:var(--txt);border:1px solid var(--line)}
+  button.primary{background:linear-gradient(135deg,var(--brand),var(--brand2));color:#fff;border-color:transparent}
+  button:active{transform:scale(.97)}
+  textarea{width:100%;background:var(--card2);border:1px solid var(--line);color:var(--txt);border-radius:10px;padding:10px;font-size:13px;font-family:inherit;resize:vertical}
+  .raw{font-size:12.5px;color:var(--sub);line-height:1.5}
+  .rawitem{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:9px 11px;margin-bottom:8px}
+  .rawitem .room{color:var(--mut);font-size:11px}
+  .rawitem.noise{opacity:.45}
+  .arrow{color:var(--mut);font-size:11px}
+  .tabs{display:flex;gap:8px;margin-bottom:14px;flex-wrap:wrap}
+  .tab{font-size:13px;padding:8px 14px;border-radius:999px;background:var(--card2);border:1px solid var(--line);color:var(--sub);cursor:pointer}
+  .tab.active{background:rgba(124,92,255,.2);color:#cbbcff;border-color:transparent}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px;position:relative}
+  .card.poke{border-color:rgba(255,180,84,.45);background:linear-gradient(180deg,rgba(255,180,84,.08),var(--card))}
+  .chiprow{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:8px}
+  .chip{font-size:11px;padding:3px 9px;border-radius:999px;background:var(--card2);color:var(--sub);border:1px solid var(--line)}
+  .chip.cat{background:rgba(124,92,255,.18);color:#bda9ff;border-color:transparent}
+  .chip.eng{background:none;color:var(--mut);border:none;padding:0;margin-left:auto}
+  .card h3{font-size:15px;margin:2px 0 6px;line-height:1.4}
+  .card .sum{font-size:12.5px;color:var(--sub);line-height:1.55;margin-bottom:8px}
+  .meta{display:flex;gap:12px;flex-wrap:wrap;font-size:11.5px;color:var(--mut)}
+  .meta b{color:var(--warn);font-weight:600}
+  .pokew{font-size:11.5px;color:var(--warn);margin-top:8px;border-top:1px dashed var(--line);padding-top:8px}
+  .empty{color:var(--mut);font-size:13px;padding:30px;text-align:center}
+  .hint{font-size:12px;color:var(--sub);line-height:1.65;background:var(--card);border:1px dashed var(--line);border-radius:10px;padding:10px;margin-bottom:12px}
+  .field{margin-bottom:10px}
+  .field label{display:block;font-size:11px;color:var(--mut);margin-bottom:4px}
+  .field input{width:100%;background:var(--card2);border:1px solid var(--line);color:var(--txt);border-radius:8px;padding:8px;font-size:13px}
+  .demo{margin-top:14px;padding-top:12px;border-top:1px dashed var(--line)}
+  .demo .panel-title{color:var(--mut);font-size:12px}
+  .auto{margin-top:14px;padding-top:12px;border-top:1px solid var(--line)}
+  .srcrow{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:9px 11px;margin-bottom:8px;font-size:12px}
+  .srcrow .r{color:var(--brand2);font-weight:600}
+  .srcrow .u{color:var(--mut);word-break:break-all}
+  .srcrow .st{color:var(--sub);margin-top:3px}
+  .srcrow .err{color:var(--pink)}
+  .srcrow .del{float:right;color:var(--pink);cursor:pointer}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">🐣</div>
+  <div><h1>破壳 · 采集管线控制台</h1><div class="tag">真实群消息 → DeepSeek 结构化 → 行动卡片</div></div>
+  <div class="badge"><span id="mode"></span><span id="ai"></span></div>
+</header>
+
+<div class="wrap">
+  <div class="left">
+    <div class="panel-title">① 粘贴真实消息（从微信来）</div>
+    <div class="hint">📱 <b>怎么用：</b>在微信里选中群消息 / 文件传输助手的笔记 → 复制 → 粘贴到下面 → 点「导入」。<br>一行一条（文件传输助手）或多行批量都可以。AI 会自动丢掉「在吗」「哈哈」这类噪音。</div>
+    <div class="field"><label>来源群名（可选，如：机械2201班级群）</label><input id="room" placeholder="文件传输助手 / 班级群 / 社团群" /></div>
+    <textarea id="paste" rows="8" placeholder="把从微信复制的真实内容贴在这里，例如你文件传输助手里那几条：
+
+找搭子
+摆脱信息茧房
+收据活动，比如学校活动，通知等等
+提升认知
+健脑
+信息过剩"></textarea>
+    <div class="controls" style="margin-top:8px">
+      <button class="primary" id="btnPaste">✅ 导入真实消息 → AI 整理</button>
+      <button id="btnReset">清空库</button>
+    </div>
+    <textarea id="input" rows="2" placeholder="或只投喂单条…" style="margin-top:10px"></textarea>
+    <div class="controls" style="margin-top:6px"><button id="btnFeed">投喂单条</button></div>
+
+    <view class="field" style="display:none"></view>
+    <div class="auto">
+      <div class="panel-title">🤖 自动采集源（RSS/Atom · 每 15 分钟自动拉取）</div>
+      <div class="hint">填一个 RSS 链接，系统会<b>定时自动抓取</b>并用 AI 整理，无需你手动操作。<br>· 公众号 → 用 <b>wewe-rss</b> 转成 RSS 再填这里<br>· 学校官网通知页若有 RSS 直接填<br>· 已内置一个示例源，启动即自动拉取演示「自动」效果</div>
+      <div class="field"><label>RSS / Atom 链接</label><input id="srcUrl" placeholder="https://… .xml" /></div>
+      <div class="field"><label>来源名（可选）</label><input id="srcRoom" placeholder="如：东华教务通知 / 某公众号" /></div>
+      <div class="controls">
+        <button class="primary" id="btnAddSrc">＋ 添加并立即抓取</button>
+        <button id="btnPollNow">↻ 立即抓取全部</button>
+      </div>
+      <div id="srcList" class="raw" style="margin-top:8px"></div>
+    </div>
+
+    <div class="demo">
+      <div class="panel-title">演示数据（不是真消息，仅测试用）</div>
+      <div class="controls">
+        <button id="btnSeed">⚡ 灌入演示样本</button>
+        <button id="btnStream">▶ 流式回放演示</button>
+      </div>
+    </div>
+
+    <div class="kpis" style="margin-top:14px">
+      <div class="kpi"><div class="v" id="k_raw">0</div><div class="l">条原始消息</div></div>
+      <div class="kpi"><div class="v" id="k_signal">0</div><div class="l">条有效信号</div></div>
+      <div class="kpi"><div class="v" id="k_rate">0%</div><div class="l">信噪提纯率</div></div>
+    </div>
+    <div class="controls">
+      <button class="primary" id="btnSeed">⚡ 灌入一批群聊样本</button>
+      <button id="btnStream">▶ 流式回放</button>
+      <button id="btnReset">清空</button>
+    </div>
+    <textarea id="input" rows="3" placeholder="自己投喂一条试试，例如：周六有人去图书馆自习吗 缺个搭子"></textarea>
+    <div class="controls" style="margin-top:8px"><button class="primary" id="btnFeed">投喂这条 → 看 AI 怎么分</button></div>
+    <div class="panel-title" style="margin-top:18px">原始流（AI 已自动丢掉噪音）</div>
+    <div class="raw" id="rawList"></div>
+  </div>
+
+  <div class="right">
+    <div class="panel-title">② AI 整理成行动卡片</div>
+    <div class="tabs" id="tabs">
+      <div class="tab active" data-t="feed">📋 活动通知聚合</div>
+      <div class="tab" data-t="radar">🎯 机会雷达</div>
+      <div class="tab" data-t="buddy">🤝 找搭子</div>
+      <div class="tab" data-t="poke">🌱 破壳</div>
+    </div>
+    <div class="grid" id="cards"></div>
+  </div>
+</div>
+
+<script>
+const API = location.origin;
+let tab = 'feed';
+let stopStream = null;
+
+async function api(p, opt){ const r = await fetch(API+p, opt); return r.json(); }
+async function health(){ const h = await api('/api/health'); document.getElementById('mode').innerHTML='<span class="dot"></span>采集:'+h.ingestMode; document.getElementById('ai').textContent='AI:'+h.llm; }
+
+async function refresh(){
+  const s = await api('/api/stats');
+  k_raw.textContent=s.raw; k_signal.textContent=s.signal; k_rate.textContent=s.signalRate+'%';
+  const raw = await api('/api/raw');
+  rawList.innerHTML = raw.slice(0,40).map(r=>{
+    return `<div class="rawitem"><span class="room">[${r.room||'群'}] ${r.sender||''}</span><br>${escapeHtml(r.text)}</div>`;
+  }).join('') || '<div class="empty">还没有真实消息<br><span style="font-size:12px">从微信复制粘贴到左边，点「导入真实消息」</span></div>';
+  renderCards();
+}
+
+async function renderCards(){
+  const data = await api('/api/'+tab);
+  cards.innerHTML = data.map(card).join('') || '<div class="empty">这个模块暂时没有内容</div>';
+}
+
+function card(it){
+  const meta=[];
+  if(it.time) meta.push('🕒 '+it.time);
+  if(it.place) meta.push('📍 '+it.place);
+  if(it.deadline) meta.push('<b>⏰ '+it.deadline+'</b>');
+  if(it.price) meta.push('💰 '+it.price);
+  return `<div class="card ${it.poke?'poke':''}">
+    <div class="chiprow"><span class="chip cat">${it.cat}</span>${(it.tags||[]).map(t=>`<span class="chip">${t}</span>`).join('')}
+      <span class="chip eng">${it.engine==='llm'?'AI':'规则'}·${Math.round((it.confidence||0)*100)}%</span></div>
+    <h3>${escapeHtml(it.title||'')}</h3>
+    <div class="sum">${escapeHtml(it.summary||'')}</div>
+    <div class="meta">${meta.join('')}</div>
+    ${it.pokeReason?`<div class="pokew">🌱 ${escapeHtml(it.pokeReason)}</div>`:''}
+    <div class="src">来源：${it.room||it.source||'群'} · ${it.sender||''}</div>
+  </div>`;
+}
+function escapeHtml(s){return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+document.getElementById('tabs').addEventListener('click',e=>{const t=e.target.closest('.tab');if(!t)return;tab=t.dataset.t;document.querySelectorAll('.tab').forEach(x=>x.classList.toggle('active',x===t));renderCards();});
+btnSeed.onclick=async()=>{await api('/api/seed',{method:'POST'});refresh();};
+btnReset.onclick=async()=>{await api('/api/reset',{method:'POST'});refresh();};
+btnPaste.onclick=async()=>{
+  const text=paste.value.trim(); if(!text)return;
+  const room=document.getElementById('room').value.trim();
+  const r=await api('/api/ingest/paste',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text,room,mode:'lines'})});
+  paste.value='';
+  alert('已解析 '+r.parsed+' 条 → 新增 '+r.added+' 条有效信号（跳过噪音 '+r.noise+'）');
+  refresh();
+};
+btnFeed.onclick=async()=>{const text=input.value.trim();if(!text)return;const room=document.getElementById('room').value.trim()||'文件传输助手';await api('/api/ingest',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text,room,sender:'我',source:'forward'})});input.value='';refresh();};
+let streaming=false;
+btnStream.onclick=async()=>{
+  if(streaming) return;
+  streaming=true; btnStream.textContent='⏳ 回放中…';
+  await api('/api/reset',{method:'POST'}); await refresh();
+  const samples = await api('/api/samples');
+  for(const m of samples){
+    await api('/api/ingest',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(m)});
+    await refresh();
+    await new Promise(r=>setTimeout(r,900));
+  }
+  streaming=false; btnStream.textContent='▶ 流式回放';
+};
+async function loadSources(){
+  const list = await api('/api/sources');
+  srcList.innerHTML = (list||[]).map(s=>{
+    const when = s.lastPoll? new Date(s.lastPoll).toLocaleTimeString() : '未抓取';
+    const stat = s.lastError? `<span class="err">✗ ${escapeHtml(s.lastError)}</span>` : `上次 ${when} · 新增 ${s.lastCount||0} 条`;
+    return `<div class="srcrow"><span class="del" data-id="${s.id}">删除</span><span class="r">${escapeHtml(s.room||'自动源')}</span><div class="u">${escapeHtml(s.url)}</div><div class="st">${stat}</div></div>`;
+  }).join('') || '<div class="empty">还没有自动源，加一个 RSS 链接</div>';
+  srcList.querySelectorAll('.del').forEach(b=>b.onclick=async()=>{ await api('/api/sources/remove',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({id:b.dataset.id})}); loadSources(); refresh(); });
+}
+btnAddSrc.onclick=async()=>{
+  const url=srcUrl.value.trim(); if(!url){alert('填一个 RSS 链接');return;}
+  const room=srcRoom.value.trim();
+  btnAddSrc.textContent='抓取中…';
+  const r=await api('/api/sources',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({url,room})});
+  btnAddSrc.textContent='＋ 添加并立即抓取';
+  if(r.error){alert(r.error);return;}
+  srcUrl.value='';
+  alert('已添加，本次自动抓取新增 '+((r.poll&&r.poll.added)||0)+' 条');
+  loadSources(); refresh();
+};
+btnPollNow.onclick=async()=>{ btnPollNow.textContent='抓取中…'; const r=await api('/api/poll',{method:'POST'}); btnPollNow.textContent='↻ 立即抓取全部'; alert('抓取完成：'+r.sources+' 个源，新增 '+r.added+' 条'); loadSources(); refresh(); };
+health(); refresh(); loadSources();
+setInterval(()=>{ if(tab) refresh(); }, 4000);
+</script>
+</body>
+</html>

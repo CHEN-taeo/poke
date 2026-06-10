@@ -1,0 +1,17 @@
+{
+  "description": "破壳 MVP — 把刷不完的群消息，变成今天值得做的 3 件事",
+  "appid": "touristappid",
+  "projectname": "poke-miniprogram",
+  "compileType": "miniprogram",
+  "libVersion": "latest",
+  "setting": {
+    "urlCheck": false,
+    "es6": true,
+    "enhance": true,
+    "postcss": true,
+    "minified": true,
+    "newFeature": true,
+    "bigPackageSizeSupport": true
+  },
+  "condition": {}
+}

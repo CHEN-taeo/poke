@@ -1,0 +1,29 @@
+{
+  "name": "poke-server",
+  "version": "0.1.0",
+  "private": true,
+  "description": "破壳 本地采集+AI管线服务（个人微信自用原型）",
+  "type": "commonjs",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node src/server.js",
+    "test:llm": "node src/test-llm.js",
+    "seed": "node -e \"require('./src/ingest/mock').seedAll().then(()=>process.exit(0))\"",
+    "source": "node scripts/source.js",
+    "source:list": "node scripts/source.js list",
+    "poll": "node scripts/source.js poll",
+    "setup:dhu": "node scripts/setup-dhu.js",
+    "find:wechat-db": "powershell -ExecutionPolicy Bypass -File scripts/find-wechat-db.ps1"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "wechaty": "^1.20.2",
+    "wechaty-puppet-xp": "^2.1.1"
+  },
+  "comment_optionalDeps": "接真微信时再装：npm i wechaty wechaty-puppet-xp"
+}

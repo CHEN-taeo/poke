@@ -1,0 +1,6 @@
+{
+  "desc": "关闭索引",
+  "rules": [
+    { "action": "disallow", "page": "*" }
+  ]
+}

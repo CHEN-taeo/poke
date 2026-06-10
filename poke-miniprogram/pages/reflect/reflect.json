@@ -1,0 +1,7 @@
+{
+  "usingComponents": {},
+  "navigationBarTitleText": "复盘",
+  "enablePullDownRefresh": true,
+  "backgroundColor": "#0f1117",
+  "backgroundTextStyle": "light"
+}

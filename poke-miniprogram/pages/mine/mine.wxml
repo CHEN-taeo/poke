@@ -1,0 +1,14 @@
+<import src="../../templates/card.wxml" />
+
+<view class="wrap">
+  <block wx:if="{{items.length}}">
+    <view class="lead">你<text class="em">主动选</text>的事都在这。这正是破壳要验证的：信息不再是用来刷的，是用来<text class="em">行动</text>的。</view>
+    <block wx:for="{{items}}" wx:key="id">
+      <template is="card" data="{{c: item}}" />
+    </block>
+  </block>
+  <view wx:else class="empty">
+    <view class="big">📌</view>还没有标记任何事
+    <view class="small">在「今天」里点「想去」或「找搭子」，会出现在这里</view>
+  </view>
+</view>

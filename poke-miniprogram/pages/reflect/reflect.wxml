@@ -1,0 +1,17 @@
+<view class="wrap">
+  <block wx:if="{{items.length}}">
+    <view class="lead">真正的成长，来自<text class="em">你做过的事</text>，不是刷过的内容。每件事 30 秒，回答一个问题就好。</view>
+    <view wx:for="{{items}}" wx:key="id" class="card">
+      <view class="chiprow"><view class="chip cat">{{item.cat}}</view></view>
+      <view class="h3">{{item.title}}</view>
+      <view class="q">🧠 {{item.q}}</view>
+      <textarea class="ta" data-id="{{item.id}}" bindinput="onInput" value="{{item.text}}"
+        auto-height maxlength="-1" placeholder="随手写两句，给未来的自己…" placeholder-style="color:#6b7280" />
+      <view class="save-note">{{item.saved ? '已保存 ✓' : ''}}</view>
+    </view>
+  </block>
+  <view wx:else class="empty">
+    <view class="big">🧠</view>还没有可复盘的事
+    <view class="small">做完一件事后点「我去过了」，这里会给你一个 30 秒的认知小问题</view>
+  </view>
+</view>

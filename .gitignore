@@ -1,0 +1,8 @@
+node_modules/
+.env
+*.log
+poke-server/.runtime/
+poke-server/node_modules/
+poke-server/data/db.json
+poke-server/data/wechat-cli-state.json
+.DS_Store

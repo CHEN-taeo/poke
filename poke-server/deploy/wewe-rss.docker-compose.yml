@@ -1,0 +1,25 @@
+# wewe-rss：把【微信公众号】变成 RSS，喂给破壳的自动采集调度器。
+# 它通过「微信读书(WeRead)」的接口读取公众号文章，不碰你的群聊、不钩主号微信客户端。
+# 强烈建议：用一个【小号】登录微信读书，不要用主号。
+#
+# 启动： 在本文件目录执行   docker compose -f wewe-rss.docker-compose.yml up -d
+# 打开： http://localhost:4000   （用下面的 AUTH_CODE 登录后台，扫码登录微信读书小号，订阅公众号）
+# 拿feed： http://localhost:4000/feeds/all.rss      （全部公众号合并的一条总feed）
+# 接进来：node scripts/source.js add "http://localhost:4000/feeds/all.rss" "公众号合集"
+#
+services:
+  wewe-rss:
+    image: cooderl/wewe-rss-sqlite:latest
+    container_name: wewe-rss
+    restart: unless-stopped
+    ports:
+      - "4000:4000"
+    environment:
+      # 后台登录密码，自己改一个
+      AUTH_CODE: "poke-2026"
+      # feed 里每篇正文是否抓全文（1=抓，慢一点但内容更全）
+      FEED_MODE: ""
+      # 服务器时区
+      SERVER_ORIGIN_URL: "http://localhost:4000"
+    volumes:
+      - ./wewe-rss-data:/app/data

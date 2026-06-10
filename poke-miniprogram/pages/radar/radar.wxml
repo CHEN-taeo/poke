@@ -1,0 +1,14 @@
+<import src="../../templates/card.wxml" />
+
+<view class="wrap">
+  <view class="lead">🎯 <text class="em">机会雷达</text>：从噪音里挑出对你成长有用的硬机会——讲座 / 竞赛 / 实习 / 奖学金，带 <text class="em">截止提醒</text>，别错过。</view>
+  <block wx:if="{{items.length}}">
+    <block wx:for="{{items}}" wx:key="id">
+      <template is="card" data="{{c: item}}" />
+    </block>
+  </block>
+  <view wx:else class="empty">
+    <view class="big">🎯</view>{{online ? '暂时没有机会类信息' : '未连接后端'}}
+    <view class="small">{{online ? '群里出现讲座/竞赛/实习时会自动出现在这' : '启动 poke-server 并在「今天」下拉刷新'}}</view>
+  </view>
+</view>

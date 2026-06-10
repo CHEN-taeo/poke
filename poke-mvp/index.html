@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<title>破壳 · 把刷不完的群消息，变成今天值得做的 3 件事</title>
+<style>
+  :root{
+    --bg:#0f1117; --card:#1a1d27; --card2:#222633; --line:#2c3140;
+    --txt:#eef1f7; --sub:#9aa3b2; --mut:#6b7280;
+    --brand:#7c5cff; --brand2:#37e0c6; --warn:#ffb454; --go:#37e0c6; --pink:#ff6b9d;
+    --r:18px; --shadow:0 8px 30px rgba(0,0,0,.35);
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;height:100%}
+  body{
+    background:var(--bg);color:var(--txt);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;
+    display:flex;justify-content:center;
+  }
+  #app{width:100%;max-width:480px;min-height:100vh;background:var(--bg);position:relative;display:flex;flex-direction:column}
+  /* header */
+  header{
+    padding:22px 18px 16px;
+    background:radial-gradient(120% 100% at 0% 0%, rgba(124,92,255,.35), transparent 60%),
+               radial-gradient(120% 100% at 100% 0%, rgba(55,224,198,.25), transparent 55%),
+               var(--bg);
+    border-bottom:1px solid var(--line);
+  }
+  .brand{display:flex;align-items:center;gap:10px}
+  .logo{width:36px;height:36px;border-radius:11px;background:linear-gradient(135deg,var(--brand),var(--brand2));
+    display:grid;place-items:center;font-size:20px;box-shadow:var(--shadow)}
+  .brand h1{font-size:20px;margin:0;letter-spacing:.5px}
+  .brand .tag{font-size:12px;color:var(--sub);margin-top:2px}
+  .datebar{display:flex;justify-content:space-between;align-items:flex-end;margin-top:14px}
+  .datebar .d{font-size:13px;color:var(--sub)}
+  .datebar .d b{color:var(--txt);font-size:15px}
+  .gear{background:var(--card2);border:1px solid var(--line);color:var(--sub);border-radius:10px;
+    padding:6px 10px;font-size:12px;cursor:pointer}
+  /* content */
+  main{flex:1;overflow-y:auto;padding:16px 14px 96px}
+  .lead{font-size:13px;color:var(--sub);margin:2px 4px 14px;line-height:1.6}
+  .lead b{color:var(--brand2)}
+  .sec-title{display:flex;align-items:center;gap:8px;margin:18px 4px 10px;font-size:13px;color:var(--sub);font-weight:600}
+  .sec-title .n{background:var(--brand);color:#fff;border-radius:8px;font-size:11px;padding:1px 7px}
+  /* card */
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:15px;margin-bottom:13px;
+    box-shadow:var(--shadow);position:relative;overflow:hidden}
+  .card.poke{border:1px solid rgba(255,180,84,.4);
+    background:linear-gradient(180deg, rgba(255,180,84,.08), var(--card))}
+  .chiprow{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:9px;align-items:center}
+  .chip{font-size:11px;padding:3px 9px;border-radius:999px;background:var(--card2);color:var(--sub);border:1px solid var(--line)}
+  .chip.cat{background:rgba(124,92,255,.18);color:#bda9ff;border-color:transparent}
+  .chip.poke{background:rgba(255,180,84,.18);color:var(--warn);border-color:transparent}
+  .card h3{margin:2px 0 6px;font-size:17px;line-height:1.4}
+  .summary{font-size:13.5px;color:var(--sub);line-height:1.6;margin:0 0 10px}
+  .meta{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--mut);margin-bottom:12px}
+  .meta span{display:flex;align-items:center;gap:4px}
+  .counts{font-size:12px;color:var(--sub);margin-bottom:10px}
+  .counts b{color:var(--brand2)}
+  .actions{display:flex;gap:9px}
+  .btn{flex:1;border:none;border-radius:12px;padding:11px;font-size:14px;font-weight:600;cursor:pointer;
+    transition:transform .08s ease, background .15s ease;display:flex;align-items:center;justify-content:center;gap:6px}
+  .btn:active{transform:scale(.97)}
+  .btn-go{background:var(--card2);color:var(--txt);border:1px solid var(--line)}
+  .btn-go.on{background:linear-gradient(135deg,var(--brand),#9b7bff);color:#fff;border-color:transparent}
+  .btn-buddy{background:var(--card2);color:var(--txt);border:1px solid var(--line)}
+  .btn-buddy.on{background:linear-gradient(135deg,#ff6b9d,#ff8fb3);color:#fff;border-color:transparent}
+  .buddies{margin-top:11px;border-top:1px dashed var(--line);padding-top:10px;font-size:12px;color:var(--sub);display:none}
+  .buddies.show{display:block}
+  .buddies .who{display:inline-flex;align-items:center;gap:6px;background:var(--card2);border:1px solid var(--line);
+    border-radius:999px;padding:4px 10px;margin:3px 5px 0 0;font-size:12px}
+  .av{width:18px;height:18px;border-radius:50%;background:linear-gradient(135deg,var(--brand),var(--brand2));
+    display:grid;place-items:center;font-size:10px;color:#fff}
+  /* empty */
+  .empty{text-align:center;color:var(--mut);padding:50px 20px;font-size:14px;line-height:1.8}
+  .empty .big{font-size:40px;margin-bottom:8px}
+  /* reflect */
+  .q{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:12px;margin:10px 0;font-size:13.5px;color:#cdd3df;line-height:1.6}
+  textarea,input,select{width:100%;background:var(--card2);border:1px solid var(--line);color:var(--txt);
+    border-radius:11px;padding:11px;font-size:14px;font-family:inherit;resize:vertical}
+  textarea:focus,input:focus,select:focus{outline:none;border-color:var(--brand)}
+  .save-note{font-size:12px;color:var(--go);margin-top:6px;height:14px}
+  /* tabbar */
+  nav{position:fixed;bottom:0;left:0;right:0;margin:0 auto;max-width:480px;background:rgba(15,17,23,.92);
+    backdrop-filter:blur(12px);border-top:1px solid var(--line);display:flex;padding:8px 6px;
+    padding-bottom:max(8px,env(safe-area-inset-bottom))}
+  nav button{flex:1;background:none;border:none;color:var(--mut);font-size:11px;cursor:pointer;
+    display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px}
+  nav button .ic{font-size:20px}
+  nav button.active{color:var(--brand2)}
+  /* modal */
+  .modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:flex-end;justify-content:center;z-index:50}
+  .modal.show{display:flex}
+  .sheet{width:100%;max-width:480px;background:var(--bg);border-top-left-radius:22px;border-top-right-radius:22px;
+    border:1px solid var(--line);max-height:92vh;overflow-y:auto;padding:18px 16px 28px}
+  .sheet h2{margin:4px 0 4px;font-size:18px}
+  .sheet .sub{color:var(--sub);font-size:12.5px;margin-bottom:14px;line-height:1.6}
+  .field{margin-bottom:12px}
+  .field label{display:block;font-size:12px;color:var(--sub);margin-bottom:5px}
+  .row{display:flex;gap:9px}
+  .row .field{flex:1}
+  .primary{width:100%;background:linear-gradient(135deg,var(--brand),var(--brand2));color:#fff;border:none;
+    border-radius:13px;padding:14px;font-size:15px;font-weight:700;cursor:pointer;margin-top:6px}
+  .ghost{width:100%;background:var(--card2);color:var(--sub);border:1px solid var(--line);border-radius:12px;
+    padding:11px;font-size:13px;cursor:pointer;margin-top:9px}
+  .danger{color:var(--pink);background:none;border:none;font-size:12px;cursor:pointer}
+  /* metrics */
+  .kpis{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:8px 0 16px}
+  .kpi{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:13px}
+  .kpi .v{font-size:26px;font-weight:800;background:linear-gradient(135deg,var(--brand2),var(--brand));
+    -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+  .kpi .l{font-size:11.5px;color:var(--sub);margin-top:3px}
+  .oplist{margin-top:6px}
+  .opitem{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:11px 12px;margin-bottom:9px;
+    display:flex;justify-content:space-between;align-items:center;gap:10px}
+  .opitem .t{font-size:13.5px}
+  .opitem .s{font-size:11.5px;color:var(--mut);margin-top:2px}
+  .opitem .e{background:var(--card2);border:1px solid var(--line);color:var(--sub);border-radius:8px;padding:5px 9px;font-size:12px;cursor:pointer}
+  .hint{font-size:11.5px;color:var(--mut);line-height:1.7;background:var(--card);border:1px dashed var(--line);
+    border-radius:12px;padding:11px;margin-top:10px}
+  .toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:#fff;color:#111;
+    padding:10px 16px;border-radius:999px;font-size:13px;font-weight:600;z-index:99;opacity:0;transition:opacity .2s;pointer-events:none}
+  .toast.show{opacity:1}
+</style>
+</head>
+<body>
+<div id="app">
+  <header>
+    <div class="brand">
+      <div class="logo">🐣</div>
+      <div>
+        <h1>破壳</h1>
+        <div class="tag">把刷不完的群消息，变成今天值得做的 3 件事</div>
+      </div>
+    </div>
+    <div class="datebar">
+      <div class="d" id="dateLabel"></div>
+      <button class="gear" id="opEntry">运营</button>
+    </div>
+  </header>
+
+  <main id="main"></main>
+
+  <nav>
+    <button data-tab="today" class="active"><span class="ic">✨</span>今天</button>
+    <button data-tab="mine"><span class="ic">📌</span>我的</button>
+    <button data-tab="reflect"><span class="ic">🧠</span>复盘</button>
+  </nav>
+</div>
+
+<!-- editor modal -->
+<div class="modal" id="opModal">
+  <div class="sheet" id="opSheet"></div>
+</div>
+<div class="modal" id="editModal">
+  <div class="sheet" id="editSheet"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ---------- storage ---------- */
+const KEY = 'poke.v1';
+const todayStr = () => new Date().toISOString().slice(0,10);
+
+const SEED = {
+  // me
+  meId: 'me',
+  meName: '我',
+  // per-day items: { date: [ {id,cat,poke,title,summary,time,place,tags[]} ] }
+  days: {
+    [todayStr()]: [
+      {id:'a1', cat:'活动', poke:false, title:'机械工程学院 · 智能制造前沿讲座',
+       summary:'AI 摘要：上海交大教授分享数字孪生在产线上的落地，含 Q&A。和你的专业高度相关，适合写进简历的谈资。',
+       time:'今天 18:30', place:'三号楼 报告厅', tags:['专业相关','可写简历']},
+      {id:'a2', cat:'搭子', poke:false, title:'周末青松大学城骑行，缺 2 人',
+       summary:'AI 摘要：从校门口到佘山往返约 30km，已有 3 人，节奏轻松。想出去走走、又不想一个人的话很合适。',
+       time:'周六 09:00', place:'青松大学城门口集合', tags:['运动','认识新朋友']},
+      {id:'a3', cat:'通知', poke:false, title:'国家奖学金申请 · 截止倒计时 3 天',
+       summary:'AI 摘要：从一堆群通知里挑出来的硬信息——你符合 GPA 门槛，材料还差一份个人陈述。别错过。',
+       time:'截止 周四 17:00', place:'学院教务办 / 线上提交', tags:['钱','别错过']},
+    ]
+  },
+  pokeOfDay: {
+    [todayStr()]: {id:'p1', cat:'破壳', poke:true, title:'隔壁服装学院的「面料创新工坊」开放旁听',
+      summary:'AI 给你塞了条圈外的：机械 × 材料 × 设计的交叉地带，正在出新东西。跨出专业茧房，常常是灵感的来源。',
+      time:'明天 14:00', place:'纺织学院 创新中心', tags:['跨学科','打破茧房']}
+  },
+  // engagement: { itemId: { go:bool, buddy:bool, attended:bool } }
+  eng: {},
+  // simulated others wanting to go (for demo of "还有几个人也想去")
+  others: { a1: 6, a2: 3, a3: 2, p1: 1 },
+  othersBuddy: { a2: 3, a1: 1 },
+  buddyNames: { a2:['林·材料','韬·机械','小鹿·设计'], a1:['阿哲·机械'] },
+  // reflections: { itemId: {text, ts} }
+  reflect: {},
+  // metric log: total go clicks ever (proxy for action)
+  log: { goClicks:0, buddyClicks:0 }
+};
+
+let S = load();
+function load(){
+  try{ const r = JSON.parse(localStorage.getItem(KEY)); if(r&&r.days) return migrate(r);}catch(e){}
+  return structuredClone(SEED);
+}
+function migrate(r){
+  // ensure today exists
+  if(!r.days[todayStr()]) r.days[todayStr()] = structuredClone(SEED.days[todayStr()]||[]);
+  if(!r.pokeOfDay) r.pokeOfDay = {};
+  r.eng=r.eng||{}; r.others=r.others||{}; r.othersBuddy=r.othersBuddy||{};
+  r.buddyNames=r.buddyNames||{}; r.reflect=r.reflect||{}; r.log=r.log||{goClicks:0,buddyClicks:0};
+  return r;
+}
+function save(){ localStorage.setItem(KEY, JSON.stringify(S)); }
+
+/* ---------- helpers ---------- */
+const $ = s => document.querySelector(s);
+const main = $('#main');
+let tab = 'today';
+
+const COG_QS = [
+  '这件事最让你意外的一点是什么？用一句话说清楚。',
+  '它和你已有的知识，能连起来的一个点是？',
+  '如果要讲给一个不懂的朋友听，你会怎么概括？',
+  '它有没有改变你原来的某个看法？哪一个？',
+  '下一步，你会因为它做一个什么小行动？'
+];
+function cogQ(id){ let h=0; for(const c of id) h=(h+c.charCodeAt(0))%COG_QS.length; return COG_QS[h]; }
+
+function toast(t){ const el=$('#toast'); el.textContent=t; el.classList.add('show'); setTimeout(()=>el.classList.remove('show'),1400); }
+
+function fmtDate(){
+  const d=new Date(); const wk=['周日','周一','周二','周三','周四','周五','周六'][d.getDay()];
+  return `${d.getMonth()+1}月${d.getDate()}日 · ${wk}`;
+}
+
+function todayItems(){
+  const base = (S.days[todayStr()]||[]).slice();
+  const p = S.pokeOfDay[todayStr()];
+  if(p) base.push(p);
+  return base;
+}
+function allItemsById(id){
+  for(const d in S.days){ const f=(S.days[d]||[]).find(x=>x.id===id); if(f) return f; }
+  for(const d in S.pokeOfDay){ if(S.pokeOfDay[d]&&S.pokeOfDay[d].id===id) return S.pokeOfDay[d]; }
+  return null;
+}
+function eng(id){ return S.eng[id]||(S.eng[id]={go:false,buddy:false,attended:false}); }
+
+/* ---------- render ---------- */
+function render(){
+  $('#dateLabel').innerHTML = `<b>${fmtDate()}</b>　今天 AI 帮你筛掉了一堆噪音`;
+  document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('active', b.dataset.tab===tab));
+  if(tab==='today') renderToday();
+  else if(tab==='mine') renderMine();
+  else renderReflect();
+  main.scrollTop=0;
+}
+
+function card(it){
+  const e = eng(it.id);
+  const goN = (S.others[it.id]||0) + (e.go?1:0);
+  const bdN = (S.othersBuddy[it.id]||0) + (e.buddy?1:0);
+  const names = (S.buddyNames[it.id]||[]).slice();
+  if(e.buddy) names.push(S.meName+'（你）');
+  const chip = it.poke?`<span class="chip cat poke">🌱 ${it.cat}</span>`:`<span class="chip cat">${it.cat}</span>`;
+  return `<div class="card ${it.poke?'poke':''}" data-id="${it.id}">
+    <div class="chiprow">${chip}${(it.tags||[]).map(t=>`<span class="chip">${t}</span>`).join('')}</div>
+    <h3>${it.title}</h3>
+    <p class="summary">${it.summary}</p>
+    <div class="meta"><span>🕒 ${it.time||''}</span><span>📍 ${it.place||''}</span></div>
+    <div class="counts"><b>${goN}</b> 人想去 · <b>${bdN}</b> 人在找搭子</div>
+    <div class="actions">
+      <button class="btn btn-go ${e.go?'on':''}" data-act="go" data-id="${it.id}">${e.go?'✓ 已想去':'想去 +1'}</button>
+      <button class="btn btn-buddy ${e.buddy?'on':''}" data-act="buddy" data-id="${it.id}">${e.buddy?'✓ 找搭子中':'找搭子'}</button>
+    </div>
+    <div class="buddies ${e.buddy?'show':''}">
+      ${names.length?('一起的：'+names.map(n=>`<span class="who"><span class="av">${n[0]}</span>${n}</span>`).join('')) : '你是第一个，等人来组队～'}
+      ${e.go?`<div style="margin-top:10px"><button class="btn btn-go" data-act="attend" data-id="${it.id}" style="${e.attended?'opacity:.6':''}">${e.attended?'✓ 已标记去过 → 去复盘':'我去过了 / 标记完成'}</button></div>`:''}
+    </div>
+  </div>`;
+}
+
+function renderToday(){
+  const items = todayItems();
+  if(!items.length){
+    main.innerHTML = `<div class="empty"><div class="big">🐣</div>今天还没有内容<br><span style="font-size:12px">点右上角「运营」录入今天值得做的 3 件事</span></div>`;
+    return;
+  }
+  const normal = items.filter(i=>!i.poke);
+  const poke = items.filter(i=>i.poke);
+  main.innerHTML =
+    `<div class="lead">少即是多 —— 破壳的目标不是给你<b>更多</b>，而是更少、更准。今天就这几条，看完就去做点什么。</div>`+
+    `<div class="sec-title"><span class="n">${normal.length}</span> 今日精选 · 值得做的事</div>`+
+    normal.map(card).join('')+
+    (poke.length?`<div class="sec-title">🌱 破壳一下 · 圈外的</div>`+poke.map(card).join(''):'');
+}
+
+function renderMine(){
+  const ids = Object.keys(S.eng).filter(id=>S.eng[id].go||S.eng[id].buddy);
+  const items = ids.map(allItemsById).filter(Boolean);
+  if(!items.length){
+    main.innerHTML = `<div class="empty"><div class="big">📌</div>还没有标记任何事<br><span style="font-size:12px">在「今天」里点「想去」或「找搭子」，会出现在这里</span></div>`;
+    return;
+  }
+  main.innerHTML = `<div class="lead">你<b>主动选</b>的事都在这。这正是破壳要验证的：信息不再是用来刷的，是用来<b>行动</b>的。</div>`
+    + items.map(card).join('');
+}
+
+function renderReflect(){
+  const ids = Object.keys(S.eng).filter(id=>S.eng[id].attended);
+  const items = ids.map(allItemsById).filter(Boolean);
+  if(!items.length){
+    main.innerHTML = `<div class="empty"><div class="big">🧠</div>还没有可复盘的事<br><span style="font-size:12px">做完一件事后点「我去过了」，这里会给你一个 30 秒的认知小问题</span></div>`;
+    return;
+  }
+  main.innerHTML = `<div class="lead">真正的成长，来自<b>你做过的事</b>，不是刷过的内容。每件事 30 秒，回答一个问题就好。</div>`
+    + items.map(it=>{
+      const r = S.reflect[it.id]||{text:''};
+      return `<div class="card"><div class="chiprow"><span class="chip cat">${it.cat}</span></div>
+        <h3>${it.title}</h3>
+        <div class="q">🧠 ${cogQ(it.id)}</div>
+        <textarea data-reflect="${it.id}" rows="3" placeholder="随手写两句，给未来的自己…">${r.text||''}</textarea>
+        <div class="save-note" data-note="${it.id}">${r.text?'已保存 ✓':''}</div>
+      </div>`;
+    }).join('');
+}
+
+/* ---------- interactions ---------- */
+main.addEventListener('click', e=>{
+  const btn = e.target.closest('[data-act]'); if(!btn) return;
+  const id = btn.dataset.id, act = btn.dataset.act, en = eng(id);
+  if(act==='go'){ en.go=!en.go; if(en.go) S.log.goClicks++; if(!en.go) en.attended=false; }
+  if(act==='buddy'){ en.buddy=!en.buddy; if(en.buddy) S.log.buddyClicks++; }
+  if(act==='attend'){ en.attended=!en.attended; if(en.attended){ toast('已标记 ✓ 去「复盘」看看'); } }
+  save(); render();
+});
+main.addEventListener('input', e=>{
+  const ta = e.target.closest('[data-reflect]'); if(!ta) return;
+  const id = ta.dataset.reflect;
+  S.reflect[id] = {text:ta.value, ts:Date.now()}; save();
+  const n = main.querySelector(`[data-note="${id}"]`); if(n) n.textContent = ta.value?'已保存 ✓':'';
+});
+document.querySelectorAll('nav button').forEach(b=>b.addEventListener('click',()=>{tab=b.dataset.tab;render();}));
+
+/* ---------- operator mode ---------- */
+$('#opEntry').addEventListener('click', openOp);
+function openOp(){
+  const items = (S.days[todayStr()]||[]);
+  const p = S.pokeOfDay[todayStr()];
+  const distinctActors = new Set(Object.keys(S.eng).filter(id=>S.eng[id].go)).size;
+  const totalGo = S.log.goClicks, totalBuddy = S.log.buddyClicks;
+  const attended = Object.values(S.eng).filter(x=>x.attended).length;
+  const reflected = Object.keys(S.reflect).filter(k=>S.reflect[k].text).length;
+  const shown = todayItems().length;
+  const ctr = shown? Math.round(distinctActors/Math.max(1,shown)*100):0;
+
+  $('#opSheet').innerHTML = `
+    <h2>运营后台</h2>
+    <div class="sub">手动录入今天值得做的 3 件事（MVP 阶段不用 AI，先验证「学生会不会真的行动」）。下面是关键指标。</div>
+    <div class="kpis">
+      <div class="kpi"><div class="v">${totalGo}</div><div class="l">「想去」总点击 · 行动信号</div></div>
+      <div class="kpi"><div class="v">${totalBuddy}</div><div class="l">「找搭子」点击 · 连接信号</div></div>
+      <div class="kpi"><div class="v">${attended}</div><div class="l">标记「去过」· 真实到场</div></div>
+      <div class="kpi"><div class="v">${reflected}</div><div class="l">写了复盘 · 成长闭环</div></div>
+    </div>
+    <div class="hint">📊 <b>最该盯的一个数：到场率。</b>「想去」很便宜，<b>真去 + 复盘</b>才证明需求是真的。本机演示数据约：精选 ${shown} 条 → 想去转化 ${ctr}%。<br>真要验证，请把这个页面发给一个班/社团，看真实的人会不会点、会不会去。</div>
+
+    <div class="sec-title" style="margin-left:0">今天的条目</div>
+    <div class="oplist">
+      ${items.map(it=>opRow(it)).join('')||'<div class="hint">还没有条目，点下面新增。</div>'}
+      <div class="opitem" style="border-style:dashed">
+        <div><div class="t">🌱 破壳卡（圈外内容）</div><div class="s">${p?p.title:'未设置'}</div></div>
+        <button class="e" data-edit="${p?p.id:'__newpoke'}">${p?'编辑':'设置'}</button>
+      </div>
+    </div>
+    <button class="primary" data-edit="__new">＋ 新增一条</button>
+    <button class="ghost" id="resetBtn">重置为示例数据</button>
+    <button class="ghost" id="closeOp">关闭</button>
+  `;
+  $('#opModal').classList.add('show');
+  $('#closeOp').onclick=()=>$('#opModal').classList.remove('show');
+  $('#resetBtn').onclick=()=>{ if(confirm('清空所有数据并恢复示例？')){ S=structuredClone(SEED); save(); $('#opModal').classList.remove('show'); render(); } };
+  $('#opSheet').querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>openEdit(b.dataset.edit));
+  $('#opSheet').querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{
+    if(confirm('删除这条？')){ S.days[todayStr()] = S.days[todayStr()].filter(x=>x.id!==b.dataset.del); save(); openOp(); render(); }
+  });
+}
+function opRow(it){
+  return `<div class="opitem"><div><div class="t">${it.cat} · ${it.title}</div><div class="s">${it.time||''} · ${it.place||''}</div></div>
+    <div style="display:flex;gap:6px"><button class="e" data-edit="${it.id}">编辑</button><button class="danger" data-del="${it.id}">删除</button></div></div>`;
+}
+
+function openEdit(id){
+  const isNew = id==='__new', isNewPoke = id==='__newpoke';
+  let it;
+  if(isNew) it={id:'i'+Date.now(),cat:'活动',poke:false,title:'',summary:'',time:'',place:'',tags:[]};
+  else if(isNewPoke) it={id:'p'+Date.now(),cat:'破壳',poke:true,title:'',summary:'',time:'',place:'',tags:['跨学科','打破茧房']};
+  else it = JSON.parse(JSON.stringify(allItemsById(id)));
+  $('#editSheet').innerHTML = `
+    <h2>${isNew||isNewPoke?'新增':'编辑'}条目</h2>
+    <div class="sub">写得像「AI 帮你筛过」的口吻：一句人话摘要 + 为什么和 TA 有关。</div>
+    <div class="field"><label>分类</label>
+      <select id="f_cat" ${it.poke?'disabled':''}>
+        ${['活动','搭子','通知','资源','破壳'].map(c=>`<option ${c===it.cat?'selected':''}>${c}</option>`).join('')}
+      </select></div>
+    <div class="field"><label>标题</label><input id="f_title" value="${esc(it.title)}" placeholder="一眼能看懂的标题"/></div>
+    <div class="field"><label>AI 摘要 / 人话说明</label><textarea id="f_sum" rows="3" placeholder="这是什么、为什么值得、和你有什么关系">${esc(it.summary)}</textarea></div>
+    <div class="row">
+      <div class="field"><label>时间</label><input id="f_time" value="${esc(it.time)}" placeholder="今天 18:30"/></div>
+      <div class="field"><label>地点</label><input id="f_place" value="${esc(it.place)}" placeholder="三号楼报告厅"/></div>
+    </div>
+    <div class="field"><label>标签（逗号分隔）</label><input id="f_tags" value="${esc((it.tags||[]).join('，'))}" placeholder="专业相关，别错过"/></div>
+    <button class="primary" id="saveItem">保存</button>
+    <button class="ghost" id="closeEdit">取消</button>
+  `;
+  $('#editModal').classList.add('show');
+  $('#closeEdit').onclick=()=>$('#editModal').classList.remove('show');
+  $('#saveItem').onclick=()=>{
+    it.cat = it.poke?'破壳':$('#f_cat').value;
+    it.title=$('#f_title').value.trim(); it.summary=$('#f_sum').value.trim();
+    it.time=$('#f_time').value.trim(); it.place=$('#f_place').value.trim();
+    it.tags=$('#f_tags').value.split(/[，,]/).map(s=>s.trim()).filter(Boolean);
+    if(!it.title){ toast('标题不能为空'); return; }
+    if(it.poke){ S.pokeOfDay[todayStr()] = it; }
+    else {
+      S.days[todayStr()] = S.days[todayStr()]||[];
+      const arr=S.days[todayStr()]; const i=arr.findIndex(x=>x.id===it.id);
+      if(i>=0) arr[i]=it; else arr.push(it);
+    }
+    save(); $('#editModal').classList.remove('show'); openOp(); render();
+  };
+}
+function esc(s){ return (s||'').replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
+
+[ '#opModal', '#editModal' ].forEach(sel=>{
+  $(sel).addEventListener('click',e=>{ if(e.target===$(sel)) $(sel).classList.remove('show'); });
+});
+
+render();
+</script>
+</body>
+</html>

@@ -1,0 +1,7 @@
+{
+  "usingComponents": {},
+  "navigationBarTitleText": "机会雷达",
+  "enablePullDownRefresh": true,
+  "backgroundColor": "#0f1117",
+  "backgroundTextStyle": "light"
+}

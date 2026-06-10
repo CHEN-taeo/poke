@@ -1,0 +1,11 @@
+<view class="wrap">
+  <view class="lead">从微信复制真实内容，或开启 wechat-cli 后把群消息「转发」到文件传输助手，会自动进破壳。</view>
+  <view class="field">
+    <text class="label">来源（可选）</text>
+    <input class="inp" value="{{room}}" bindinput="onRoom" placeholder="文件传输助手 / 班级群名" />
+  </view>
+  <textarea class="ta" value="{{text}}" bindinput="onText" auto-height maxlength="-1"
+    placeholder="粘贴从微信复制的真实消息…&#10;例如：&#10;找搭子&#10;某某讲座今晚7点三教&#10;国家奖学金截止周四" />
+  <view class="primary" bindtap="submit">{{loading ? 'AI 整理中…' : '导入 → AI 整理'}}</view>
+  <view class="hint">导入后回到「今天」下拉刷新即可看到真实卡片。噪音（在吗/哈哈）会自动丢掉。</view>
+</view>
