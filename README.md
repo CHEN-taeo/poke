@@ -1,5 +1,11 @@
 # 破壳 Poke
 
+<p align="center">
+  <img src="https://img.shields.io/github/last-commit/CHEN-taeo/poke" alt="Last Commit">
+  <img src="https://img.shields.io/badge/License-MIT-green" alt="License">
+</p>
+
+
 Campus information filter → actionable cards. **Separate product** from [Idea Forge / 构想熔炉](https://github.com/CHEN-taeo/idea-forge).
 
 Turn noisy WeChat groups, official accounts, and school notices into structured cards (讲座 / 搭子 / 机会 / 二手).
