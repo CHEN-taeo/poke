@@ -1,14 +1,42 @@
+<import src="../../templates/hero.wxml" />
 <import src="../../templates/card.wxml" />
 
-<view class="wrap">
-  <view class="lead">🎯 <text class="em">机会雷达</text>：从噪音里挑出对你成长有用的硬机会——讲座 / 竞赛 / 实习 / 奖学金，带 <text class="em">截止提醒</text>，别错过。</view>
-  <block wx:if="{{items.length}}">
-    <block wx:for="{{items}}" wx:key="id">
-      <template is="card" data="{{c: item}}" />
-    </block>
+<template is="hero" data="{{heroData}}" />
+
+<view class="wrap tabpage">
+  <view class="filterbar">
+    <picker mode="selector" range="{{filters}}" value="{{filterIndex}}" bindchange="onFilter">
+      <view class="filterpick">{{filters[filterIndex]}}</view>
+    </picker>
+  </view>
+
+  <block wx:if="{{gapItems.length}}">
+    <view class="card-group">
+      <view class="sec-title">
+        <image class="seal-icon" src="/assets/seal-dot.svg" mode="aspectFit" />
+        <text class="n alert">!</text>你可能漏掉的
+      </view>
+      <view class="card-inset">
+        <block wx:for="{{gapItems}}" wx:key="id">
+          <template is="card" data="{{c: item}}" />
+        </block>
+      </view>
+    </view>
   </block>
-  <view wx:else class="empty">
-    <view class="big">🎯</view>{{online ? '暂时没有机会类信息' : '未连接后端'}}
-    <view class="small">{{online ? '群里出现讲座/竞赛/实习时会自动出现在这' : '启动 poke-server 并在「今天」下拉刷新'}}</view>
+
+  <view class="card-group">
+    <view class="sec-title"><text class="n">{{items.length}}</text>全部机会</view>
+    <block wx:if="{{items.length}}">
+      <view class="card-inset">
+        <block wx:for="{{items}}" wx:key="id">
+          <template is="card" data="{{c: item}}" />
+        </block>
+      </view>
+    </block>
+    <view wx:else class="empty">
+      <image class="empty-img" src="/assets/empty-signal.svg" mode="aspectFit" />
+      <view class="empty-title">{{online ? '暂无匹配活动' : '未连接后端'}}</view>
+      <view class="small">{{online ? '粘贴班委群消息到「导入」，或等待官网采集' : '启动 poke-server 后下拉刷新'}}</view>
+    </view>
   </view>
 </view>

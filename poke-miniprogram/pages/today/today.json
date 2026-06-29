@@ -1,7 +1,7 @@
 {
   "usingComponents": {},
-  "navigationBarTitleText": "破壳",
+  "navigationStyle": "custom",
   "enablePullDownRefresh": true,
-  "backgroundColor": "#0f1117",
-  "backgroundTextStyle": "light"
+  "backgroundColor": "#F7F5F2",
+  "backgroundTextStyle": "dark"
 }

@@ -21,6 +21,17 @@
 
 接口：`GET /api/sources`、`POST /api/sources {url,room}`、`POST /api/poll`（立即全量抓取）、`POST /api/sources/remove {id}`。
 
+## 🤖 AI 脉动（全网 AI 成就与用法）
+
+与校园源平行：`data/ai-sources.json` + 专用管线 `src/ai/aiPipeline.js`。
+
+- `.env`：`AI_AUTO_INGEST=1`、`AI_AUTO_INTERVAL_MIN=60`（默认 60 分钟轮询）
+- 可选：`GITHUB_TOKEN`（提高 GitHub Search 配额）、`RSSHUB_BASE`（B站 UP 主等无 RSS 站点）
+- YouTube 频道：`https://www.youtube.com/feeds/videos.xml?channel_id=...`
+- 播客：直接用节目 RSS
+- 接口：`GET /api/ai-pulse`、`GET /api/ai-pulse/digest`、`POST /api/poll-ai`、`GET /api/ai-sources`
+- 投喂：粘贴含 `【AI脉动投喂】` 标记的文本到 `/api/ingest/paste` 自动走 AI 管线
+
 ## 立即跑（mock 模式，零配置，不碰微信）
 
 ```bash

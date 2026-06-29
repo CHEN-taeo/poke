@@ -31,4 +31,29 @@ async function chatJSON(system, user) {
   }
 }
 
-module.exports = { enabled, chatJSON };
+async function chatPlain(system, user) {
+  if (!enabled()) return null;
+  try {
+    const res = await fetch(BASE + '/chat/completions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + KEY },
+      body: JSON.stringify({
+        model: MODEL,
+        messages: [
+          { role: 'system', content: system },
+          { role: 'user', content: user }
+        ],
+        temperature: 0.3,
+        max_tokens: 280
+      })
+    });
+    if (!res.ok) return null;
+    const data = await res.json();
+    return (data.choices?.[0]?.message?.content || '').trim() || null;
+  } catch (e) {
+    console.warn('[llm] plain error:', e.message);
+    return null;
+  }
+}
+
+module.exports = { enabled, chatJSON, chatPlain };

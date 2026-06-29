@@ -1,0 +1,84 @@
+<page-meta root-class="{{themeDark ? 'theme-dark' : ''}}" background-color="{{themeDark ? '#15171C' : '#F7F5F2'}}" />
+<view class="page-texture"></view>
+
+<import src="../../templates/masonry-card.wxml" />
+
+<view class="welcome-bar glass-bar" style="padding-top:{{navPadTop}}px;padding-right:{{navPadRight}}px">
+  <view class="welcome-brand">{{brandName}}</view>
+  <view class="type-title">一画破虚</view>
+  <view class="welcome-sub">笔划开空白，灵感浮现</view>
+</view>
+
+<view class="wrap tabpage">
+  <view class="search-wrap">
+    <view class="search-line {{focused ? 'focus' : ''}}">
+      <text class="search-icon">⌕</text>
+      <input
+        class="search-inp"
+        value="{{query}}"
+        placeholder="搜索或自然语言，如「这周截止的比赛」"
+        placeholder-style="color:rgba(42,46,55,0.35)"
+        bindinput="onQuery"
+        bindfocus="onFocus"
+        bindblur="onBlur"
+        confirm-type="search"
+      />
+    </view>
+  </view>
+
+  <view wx:if="{{loading}}" class="ink-loader">
+    <view class="ink-blob"></view>
+    <view class="ink-blob"></view>
+    <view class="ink-blob"></view>
+  </view>
+
+  <block wx:elif="{{results.length}}">
+    <view class="type-caption" style="margin-bottom:16rpx">找到 {{results.length}} 条</view>
+    <view class="masonry">
+      <view class="masonry-col">
+        <block wx:for="{{leftCol}}" wx:key="id">
+          <template is="masonryCard" data="{{c: item}}" />
+        </block>
+      </view>
+      <view class="masonry-col">
+        <block wx:for="{{rightCol}}" wx:key="id">
+          <template is="masonryCard" data="{{c: item}}" />
+        </block>
+      </view>
+    </view>
+  </block>
+
+  <view wx:elif="{{query}}" class="empty">
+    <view class="empty-title">未找到相关内容</view>
+    <view class="small">换个关键词试试，或用自然语言如「这周截止的比赛」</view>
+  </view>
+
+  <block wx:else>
+    <view wx:if="{{recentSearches.length}}" class="explore-block">
+      <view class="explore-title">最近搜索</view>
+      <view class="explore-chips">
+        <view wx:for="{{recentSearches}}" wx:key="*this" class="explore-chip" data-q="{{item}}" bindtap="onHintTap">{{item}}</view>
+      </view>
+    </view>
+
+    <view wx:if="{{topTags.length}}" class="explore-block">
+      <view class="explore-title">常用标签</view>
+      <view class="explore-chips">
+        <view wx:for="{{topTags}}" wx:key="name" class="explore-chip" data-tag="{{item.name}}" bindtap="onTagHint">{{item.name}}</view>
+      </view>
+    </view>
+
+    <view wx:if="{{biasTags.length}}" class="explore-block">
+      <view class="explore-title">你收藏最多的方向</view>
+      <view class="explore-chips">
+        <view wx:for="{{biasTags}}" wx:key="label" class="explore-chip" data-q="{{item.label}}" bindtap="onHintTap">{{item.label}} · {{item.count}}</view>
+      </view>
+    </view>
+
+    <view wx:if="{{!recentSearches.length && !topTags.length}}" class="empty">
+      <view class="firefly-empty-glow"></view>
+      <view class="empty-title">第一点光，还在等你拾起</view>
+      <view class="small">试试「适合机械专业的机会」或「这周截止」</view>
+    </view>
+  </block>
+</view>

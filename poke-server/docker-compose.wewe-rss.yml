@@ -1,0 +1,16 @@
+# WeWe-RSS：个人微信读书账号 → 公众号 RSS
+# 启动：npm run wewe:up  或  docker compose -f docker-compose.wewe-rss.yml up -d
+# 管理台：http://127.0.0.1:4000  （AUTH_CODE 见 .env WEWE_RSS_AUTH_CODE）
+services:
+  wewe-rss:
+    image: cooderl/wewe-rss-sqlite:latest
+    ports:
+      - "${WEWE_RSS_PORT:-4000}:4000"
+    environment:
+      DATABASE_TYPE: sqlite
+      AUTH_CODE: ${WEWE_RSS_AUTH_CODE:-123567}
+      # FEED_MODE: fulltext
+      # CRON_EXPRESSION: "35 5,17 * * *"
+    volumes:
+      - ./data/wewe-rss:/app/data
+    restart: unless-stopped

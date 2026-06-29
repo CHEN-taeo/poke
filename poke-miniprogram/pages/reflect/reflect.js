@@ -4,7 +4,12 @@ const api = require('../../utils/api.js');
 Page({
   data: { items: [], online: false },
 
-  onShow() { this.refresh(); },
+  onShow() {
+    if (typeof this.getTabBar === 'function' && this.getTabBar()) {
+      this.getTabBar().setData({ selected: 4 });
+    }
+    this.refresh();
+  },
   onPullDownRefresh() { this.refresh().then(() => wx.stopPullDownRefresh()); },
 
   async refresh() {

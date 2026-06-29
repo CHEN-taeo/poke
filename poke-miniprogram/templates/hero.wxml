@@ -1,0 +1,29 @@
+<template name="hero">
+  <view class="hero">
+    <image class="hero-bg" src="/assets/hero-mist.svg" mode="aspectFill" />
+    <view class="hero-body">
+      <view class="hero-top" wx:if="{{toolbar}}">
+        <view class="hero-top-left">
+          <image wx:if="{{showMark}}" class="hero-mark-sm" src="/assets/shell-mark.svg" mode="aspectFit" />
+          <view>
+            <view class="type-hero">{{title}}</view>
+            <view class="type-caption hero-sub">{{subtitle}}</view>
+          </view>
+        </view>
+        <view class="hero-actions">
+          <view wx:if="{{actionMuted}}" class="hero-link muted" bindtap="onHeroMuted">{{actionMuted}}</view>
+          <view wx:if="{{actionPrimary}}" class="hero-link" bindtap="onHeroPrimary">{{actionPrimary}}</view>
+        </view>
+      </view>
+      <block wx:else>
+        <image wx:if="{{showMark}}" class="hero-mark" src="/assets/shell-mark.svg" mode="aspectFit" />
+        <view class="type-hero">{{title}}</view>
+        <view class="type-caption hero-sub">{{subtitle}}</view>
+      </block>
+      <view wx:if="{{meta}}" class="hero-meta">
+        <text class="status-dot {{metaOnline ? '' : 'off'}}"></text>
+        <text>{{meta}}</text>
+      </view>
+    </view>
+  </view>
+</template>

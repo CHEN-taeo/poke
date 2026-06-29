@@ -1,14 +1,103 @@
-<import src="../../templates/card.wxml" />
+<page-meta root-class="{{themeDark ? 'theme-dark' : ''}}" background-color="{{themeDark ? '#15171C' : '#F7F5F2'}}" />
+<view class="page-texture"></view>
 
-<view class="wrap">
-  <block wx:if="{{items.length}}">
-    <view class="lead">你<text class="em">主动选</text>的事都在这。这正是破壳要验证的：信息不再是用来刷的，是用来<text class="em">行动</text>的。</view>
-    <block wx:for="{{items}}" wx:key="id">
-      <template is="card" data="{{c: item}}" />
-    </block>
-  </block>
-  <view wx:else class="empty">
-    <view class="big">📌</view>还没有标记任何事
-    <view class="small">在「今天」里点「想去」或「找搭子」，会出现在这里</view>
+<view class="welcome-bar glass-bar" style="padding-top:{{navPadTop}}px;padding-right:{{navPadRight}}px">
+  <view class="welcome-brand">{{brandName}}</view>
+  <view class="type-title">收藏图谱</view>
+  <view class="welcome-sub">每一次收录，都在星丛中留下光点</view>
+</view>
+
+<view class="wrap tabpage">
+  <view class="constellation glass">
+    <view class="constellation-bg"></view>
+    <view
+      wx:for="{{clusters}}"
+      wx:key="tag"
+      class="cluster-label"
+      style="left:{{item.left}}%;top:{{item.top}}%"
+      data-tag="{{item.tag}}"
+      catchtap="onClusterTap"
+    >{{item.tag}}·{{item.count}}</view>
+    <view
+      wx:for="{{stars}}"
+      wx:key="id"
+      class="star-dot"
+      style="left:{{item.left}}%;top:{{item.top}}%;width:{{item.size}}rpx;height:{{item.size}}rpx;background:{{item.color}}"
+      data-id="{{item.id}}"
+      catchtap="onStarTap"
+    ></view>
   </view>
+
+  <view class="stats-row glass" style="border-radius:24rpx;padding:8rpx 0">
+    <view class="stat-cell">
+      <view class="stat-num">{{savedCount}}</view>
+      <view class="stat-label">我的收藏</view>
+    </view>
+    <view class="stat-cell">
+      <view class="stat-num">{{totalCount}}</view>
+      <view class="stat-label">灵感总计</view>
+    </view>
+    <view class="stat-cell">
+      <view class="stat-num">{{tagCount}}</view>
+      <view class="stat-label">标签数</view>
+    </view>
+  </view>
+
+  <view wx:if="{{diet.length}}" class="brush-rule"></view>
+  <view wx:if="{{diet.length}}">
+    <view class="sec-title" style="margin-top:0">本周信息饮食</view>
+    <view class="diet-row">
+      <view wx:for="{{diet}}" wx:key="key" class="diet-bar">
+        <view class="diet-pct">{{item.pct}}%</view>
+        <view class="diet-label">{{item.label}}</view>
+      </view>
+    </view>
+  </view>
+
+  <view wx:if="{{bias.length}}">
+    <view class="sec-title">你最近偏向</view>
+    <view wx:for="{{bias}}" wx:key="label" class="bias-line">
+      收藏了 {{item.count}} 条「{{item.label}}」
+    </view>
+  </view>
+
+  <view wx:if="{{reminders.length}}" class="brush-rule"></view>
+  <view wx:if="{{reminders.length}}">
+    <view class="sec-title" style="margin-top:0">待办提醒</view>
+    <view wx:for="{{reminders}}" wx:key="id" class="shelf-row glass" data-id="{{item.id}}" bindtap="onReminderTap">
+      <view class="shelf-title">{{item.title}}</view>
+      <view class="type-caption">{{item.whenText || item.label}}</view>
+    </view>
+  </view>
+
+  <view wx:if="{{shelf.length}}" class="brush-rule"></view>
+  <view wx:if="{{shelf.length}}">
+    <view class="sec-title" style="margin-top:0">收藏回访</view>
+    <view wx:for="{{shelf}}" wx:key="id" class="shelf-row glass" data-id="{{item.id}}" bindtap="onShelfTap">
+      <view class="shelf-title">{{item.title}}</view>
+      <view wx:if="{{item.note}}" class="shelf-note">「{{item.note}}」</view>
+      <view wx:else class="type-caption">{{item.cat}}</view>
+    </view>
+  </view>
+
+  <view class="brush-rule"></view>
+
+  <view class="sec-title" style="margin-top:0">偏好设置</view>
+  <view class="type-caption" style="margin:0 16rpx 16rpx">影响首页与机会的排序权重</view>
+  <view class="chiprow interestrow">
+    <view wx:for="{{interestOpts}}" wx:key="*this"
+      class="chip interest {{interests.indexOf(item) >= 0 ? 'on' : ''}}"
+      data-key="{{item}}" bindtap="toggleInterest">{{item}}</view>
+  </view>
+
+  <view class="field-row" style="display:flex;justify-content:space-between;align-items:center;margin-top:24rpx">
+    <view class="type-caption">深色模式</view>
+    <switch checked="{{themeDark}}" bindchange="onThemeToggle" color="#6B8CAE"/>
+  </view>
+
+  <view class="ghost" bindtap="goAccounts">公众号订阅</view>
+  <view class="ghost" style="margin-top:16rpx" bindtap="goAdd">落笔收录</view>
+  <view wx:if="{{online}}" class="ghost" style="margin-top:16rpx" bindtap="goOperator">运营后台</view>
+
+  <view class="foot-note">{{brandName}} · {{brandSlogan}}</view>
 </view>

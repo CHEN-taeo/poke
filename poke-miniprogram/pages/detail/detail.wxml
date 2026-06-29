@@ -1,0 +1,194 @@
+<view wx:if="{{loading}}" class="detail-page">
+  <view class="detail-nav" style="padding-top:{{statusBarHeight}}px">
+    <view class="detail-nav-back" bindtap="onBack">‹ 返回</view>
+  </view>
+  <view class="detail-hero-skeleton skeleton-block"></view>
+  <view class="wrap detail-body">
+    <view class="skeleton-line w60"></view>
+    <view class="skeleton-line w90"></view>
+    <view class="skeleton-line w80"></view>
+    <view class="skeleton-card"></view>
+    <view class="skeleton-card"></view>
+  </view>
+</view>
+
+<view wx:elif="{{item}}" class="detail-page {{ready ? 'detail-ready' : ''}}">
+  <view class="detail-nav detail-nav-overlay" style="padding-top:{{statusBarHeight}}px">
+    <view class="detail-nav-back" bindtap="onBack">‹ 返回</view>
+  </view>
+  <view class="detail-hero">
+    <image
+      class="detail-cover {{coverLoaded ? 'cover-loaded' : ''}}"
+      src="{{item.coverSrc}}"
+      mode="aspectFill"
+      bindload="onCoverLoad"
+    />
+    <view class="detail-hero-mask"></view>
+    <view wx:if="{{item.deadline}}" class="detail-deadline-badge {{item.deadlineUrgent ? 'urgent' : ''}}">
+      {{item.deadline}}
+    </view>
+  </view>
+
+  <view class="wrap detail-body detail-pad-bottom">
+    <view class="detail-block detail-enter d0">
+      <view class="chiprow">
+        <view class="chip cat {{item.poke ? 'poke' : ''}}" style="{{item.chipStyle}}">{{item.poke ? item.pokeChip + ' · ' : ''}}{{item.aiTopic || item.eventType || item.cat}}</view>
+        <view wx:if="{{item.platform}}" class="chip plat">{{item.platform}}</view>
+        <view wx:if="{{item.room}}" class="chip">{{item.room}}</view>
+      </view>
+      <view class="type-hero detail-title">{{item.title}}</view>
+
+      <view wx:if="{{item.keyFacts.length}}" class="key-facts glass detail-enter d0">
+        <view wx:for="{{item.keyFacts}}" wx:for-item="fact" wx:key="k" class="key-fact-row">
+          <text class="key-fact-k">{{fact.k}}</text>
+          <text class="key-fact-v">{{fact.v}}</text>
+        </view>
+      </view>
+
+      <view wx:if="{{item.sourceMp}}" class="type-caption mp-hint">公众号全文已收录 · 无需跳转微信阅读</view>
+
+      <view wx:if="{{item.gapReasonsFull.length}}" class="detail-reasons">
+        <image class="seal-icon" src="/assets/seal-dot.svg" mode="aspectFit" />
+        <view wx:for="{{item.gapReasonsFull}}" wx:for-item="reason" wx:key="*this" class="gapchip gap-1">{{reason}}</view>
+      </view>
+      <view wx:if="{{item.tagList.length}}" class="detail-pills" style="margin-top:12rpx">
+        <view wx:for="{{item.tagList}}" wx:for-item="tag" wx:key="*this" class="detail-pill">{{tag}}</view>
+      </view>
+    </view>
+
+    <view class="detail-block detail-enter d1">
+      <view class="detail-label">30 秒读懂</view>
+      <view class="type-body detail-lede">{{item.detailLede}}</view>
+      <view wx:if="{{item.highlights.length}}" class="detail-pills">
+        <view wx:for="{{item.highlights}}" wx:for-item="hl" wx:key="*this" class="detail-pill">{{hl}}</view>
+      </view>
+    </view>
+
+    <view class="card-group detail-enter d2">
+      <view class="sec-title">适合谁</view>
+      <view class="card-inset detail-inset">
+        <view wx:for="{{item.whoFor}}" wx:for-item="who" wx:key="*this" class="detail-list-item">
+          <text class="detail-bullet">·</text>
+          <text>{{who}}</text>
+        </view>
+      </view>
+    </view>
+
+    <view class="card-group detail-enter d2">
+      <view class="sec-title">要做什么</view>
+      <view class="card-inset detail-inset">
+        <view wx:for="{{item.actions}}" wx:for-item="actLine" wx:key="*this" class="detail-list-item numbered">
+          <text class="detail-num">{{index + 1}}</text>
+          <text>{{actLine}}</text>
+        </view>
+      </view>
+    </view>
+
+    <view wx:if="{{item.displayBody}}" class="detail-block detail-enter d2">
+      <view class="detail-label">完整正文</view>
+      <view class="detail-fullbody">{{item.displayBody}}</view>
+    </view>
+
+    <view wx:if="{{item.caveats.length}}" class="detail-caveats detail-enter d3">
+      <view class="detail-label">注意</view>
+      <view wx:for="{{item.caveats}}" wx:for-item="cav" wx:key="*this" class="detail-caveat-item">{{cav}}</view>
+    </view>
+
+    <view wx:if="{{item.insiderNote}}" class="insider detail-insider detail-enter d3">
+      {{item.insiderNote}}<text class="insider-disclaimer"> · 个人体验，仅供参考</text>
+    </view>
+
+    <view wx:if="{{item.pokeReason}}" class="pokereason detail-enter d3">{{item.pokeReason}}</view>
+
+    <view class="detail-block detail-enter d3">
+      <view class="sec-title" style="margin-top:0">下一步</view>
+      <view class="action-row">
+        <view class="action-chip {{item.hasReminder ? 'on' : ''}}" bindtap="onRemind">
+          {{item.hasReminder ? '已设提醒' : '提醒我'}}
+        </view>
+        <view class="action-chip {{item.saved ? 'on' : ''}}" data-act="save" data-id="{{item.id}}" bindtap="onSave">
+          {{item.saved ? '已收藏' : '收藏'}}
+        </view>
+      </view>
+
+      <view class="detail-label" style="margin-top:20rpx">一键追问</view>
+      <view class="ask-sheet">
+        <view wx:for="{{askPresets}}" wx:for-item="q" wx:key="*this" class="ask-q" data-q="{{q}}" bindtap="onAskTap">{{q}}</view>
+        <view wx:if="{{askAnswer}}" class="ask-a">{{askAnswer}}</view>
+      </view>
+
+      <view class="detail-label" style="margin-top:20rpx">收藏理由</view>
+      <view class="note-box">
+        <textarea
+          class="note-inp"
+          value="{{userNote}}"
+          placeholder="写一句你为什么收藏它…"
+          placeholder-style="color:rgba(42,46,55,0.35)"
+          bindinput="onNoteInput"
+          bindblur="onNoteBlur"
+          maxlength="200"
+        />
+      </view>
+    </view>
+
+    <view wx:if="{{item.rawText && item.rawText !== item.displayBody}}" class="detail-block detail-enter d4">
+      <view class="detail-label">原始消息</view>
+      <view class="detail-raw">{{item.rawText}}</view>
+    </view>
+
+    <view class="detail-block detail-enter d4">
+      <view class="detail-label">信息来源</view>
+      <view class="detail-meta-card">
+        <view wx:if="{{item.engine}}" class="detail-meta-row">
+          <text class="detail-meta-k">引擎</text>
+          <text class="detail-meta-v">{{item.engine === 'llm' ? 'DeepSeek' : '规则引擎'}}</text>
+        </view>
+        <view wx:if="{{item.confidence}}" class="detail-meta-row">
+          <text class="detail-meta-k">置信度</text>
+          <text class="detail-meta-v">{{item.confidence}}%</text>
+        </view>
+        <view wx:if="{{item.createdAt}}" class="detail-meta-row">
+          <text class="detail-meta-k">收录</text>
+          <text class="detail-meta-v">{{item.createdAt}}</text>
+        </view>
+        <view wx:if="{{item.time}}" class="detail-meta-row">
+          <text class="detail-meta-k">时间</text>
+          <text class="detail-meta-v">{{item.time}}</text>
+        </view>
+        <view wx:if="{{item.place}}" class="detail-meta-row">
+          <text class="detail-meta-k">地点</text>
+          <text class="detail-meta-v">{{item.place}}</text>
+        </view>
+        <view wx:if="{{item.deadline}}" class="detail-meta-row">
+          <text class="detail-meta-k">截止</text>
+          <text class="detail-meta-v">{{item.deadline}}</text>
+        </view>
+        <view wx:if="{{item.stars}}" class="detail-meta-row">
+          <text class="detail-meta-k">热度</text>
+          <text class="detail-meta-v">⭐ {{item.stars}}</text>
+        </view>
+        <view wx:if="{{!item.engine && !item.createdAt && !item.time && !item.place && !item.deadline}}" class="type-caption">暂无补充元信息</view>
+      </view>
+    </view>
+  </view>
+
+  <view wx:if="{{showFireflyFly}}" class="firefly-fly" style="left:{{flyX}}px;top:{{flyY}}px"></view>
+
+  <view class="detail-sticky">
+    <view class="detail-sticky-primary" data-act="save" data-id="{{item.id}}" bindtap="onSave">{{item.saved ? '已收藏' : '收藏'}}</view>
+    <view class="detail-sticky-row">
+      <view class="detail-sticky-ghost" bindtap="onCopyAll">复制全部信息</view>
+      <view class="detail-sticky-ghost" bindtap="onRemind">{{item.hasReminder ? '已提醒' : '提醒我'}}</view>
+      <view class="detail-sticky-ghost" bindtap="onShare">分享图</view>
+    </view>
+  </view>
+</view>
+
+<view wx:elif="{{missing}}" class="empty wrap">
+  <view class="detail-nav" style="padding-top:{{statusBarHeight}}px">
+    <view class="detail-nav-back" bindtap="onBack">‹ 返回</view>
+  </view>
+  <image class="empty-img" src="/assets/empty-signal.svg" mode="aspectFit" />
+  <view class="empty-title">找不到这条信息</view>
+  <view class="small">可能已过期，请返回列表刷新后再试</view>
+</view>

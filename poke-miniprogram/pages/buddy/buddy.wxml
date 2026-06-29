@@ -1,14 +1,19 @@
-<import src="../../templates/card.wxml" />
-
-<view class="wrap">
-  <view class="lead">🤝 <text class="em">找搭子</text>：不尬聊。每条都锚定到一件具体的事——想去就 <text class="em">+1</text>，凑齐人就成行。</view>
-  <block wx:if="{{items.length}}">
-    <block wx:for="{{items}}" wx:key="id">
-      <template is="card" data="{{c: item}}" />
-    </block>
-  </block>
-  <view wx:else class="empty">
-    <view class="big">🤝</view>{{online ? '暂时没有搭子需求' : '未连接后端'}}
-    <view class="small">{{online ? '群里有人约人/组队时会自动出现在这' : '启动 poke-server 并在「今天」下拉刷新'}}</view>
-  </view>
-</view>
+<import src="../../templates/card.wxml" />
+
+<view class="page-section">
+  <view class="page-section-title">搭子</view>
+  <view class="page-section-sub">锚定具体的事，凑齐就成行</view>
+</view>
+
+<view class="wrap tabpage" style="padding-top:0">
+  <block wx:if="{{items.length}}">
+    <block wx:for="{{items}}" wx:key="id">
+      <template is="card" data="{{c: item}}" />
+    </block>
+  </block>
+  <view wx:else class="empty">
+    <view class="empty-illus"><view class="arc"></view><view class="dot"></view></view>
+    <view class="empty-title">{{online ? '暂时没有搭子需求' : '未连接后端'}}</view>
+    <view class="small">{{online ? '群里有人约人、组队时会自动出现在这' : '启动 poke-server 后下拉刷新'}}</view>
+  </view>
+</view>

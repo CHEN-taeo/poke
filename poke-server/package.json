@@ -14,7 +14,10 @@
     "source:list": "node scripts/source.js list",
     "poll": "node scripts/source.js poll",
     "setup:dhu": "node scripts/setup-dhu.js",
-    "find:wechat-db": "powershell -ExecutionPolicy Bypass -File scripts/find-wechat-db.ps1"
+    "find:wechat-db": "powershell -ExecutionPolicy Bypass -File scripts/find-wechat-db.ps1",
+    "wewe": "node scripts/wewe-rss.js",
+    "wewe:up": "docker compose -f docker-compose.wewe-rss.yml up -d",
+    "wewe:down": "docker compose -f docker-compose.wewe-rss.yml down"
   },
   "engines": {
     "node": ">=18"

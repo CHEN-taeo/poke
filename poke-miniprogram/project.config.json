@@ -1,17 +1,48 @@
 {
-  "description": "破壳 MVP — 把刷不完的群消息，变成今天值得做的 3 件事",
-  "appid": "touristappid",
+  "description": "流萤 — 拾起散落的光，个人信息捕捞与整理",
+  "appid": "wx37b3449199acea3b",
   "projectname": "poke-miniprogram",
   "compileType": "miniprogram",
   "libVersion": "latest",
   "setting": {
     "urlCheck": false,
     "es6": true,
-    "enhance": true,
+    "enhance": false,
     "postcss": true,
     "minified": true,
     "newFeature": true,
-    "bigPackageSizeSupport": true
+    "bigPackageSizeSupport": true,
+    "compileWorklet": false,
+    "uglifyFileName": false,
+    "uploadWithSourceMap": true,
+    "packNpmManually": false,
+    "packNpmRelationList": [],
+    "minifyWXSS": true,
+    "minifyWXML": true,
+    "localPlugins": false,
+    "disableUseStrict": false,
+    "useCompilerPlugins": false,
+    "condition": false,
+    "swc": false,
+    "disableSWC": true,
+    "ignoreDevUnusedFiles": false,
+    "ignoreUploadUnusedFiles": false,
+    "babelSetting": {
+      "ignore": [],
+      "disablePlugins": [],
+      "outputPath": ""
+    }
   },
-  "condition": {}
+  "condition": {},
+  "simulatorPluginLibVersion": {},
+  "packOptions": {
+    "ignore": [],
+    "include": [
+      { "type": "glob", "value": "pages/**/*.js" },
+      { "type": "glob", "value": "pages/**/*.wxml" },
+      { "type": "glob", "value": "pages/**/*.wxss" },
+      { "type": "glob", "value": "pages/**/*.json" }
+    ]
+  },
+  "editorSetting": {}
 }

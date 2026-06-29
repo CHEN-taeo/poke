@@ -1,5 +1,7 @@
 # wechat-cli 安装与排错（Windows · v1.6.19）
 
+> **Win 微信 4.1.10+ 目前无法提取密钥**（`wxkey setup failed`）。个人自用请改走 **[WeWe-RSS 公众号方案](./wewe-rss.md)**，群消息仍用手动转发 + 小程序「导入」。
+
 ## 你已完成的步骤
 
 ```powershell

@@ -1,0 +1,49 @@
+<page-meta root-class="{{themeDark ? 'theme-dark' : ''}}" background-color="{{themeDark ? '#15171C' : '#F7F5F2'}}" />
+<view class="page-texture"></view>
+
+<view class="add-page">
+  <view class="welcome-bar glass-bar" style="padding-top:{{navPadTop}}px;padding-right:{{navPadRight}}px;display:flex;justify-content:space-between;align-items:center">
+    <view class="detail-nav-back" bindtap="onCancel">取消</view>
+    <view class="type-caption">{{brandName}} · 一纸宣白</view>
+    <view class="detail-nav-back" style="color:var(--accent)" bindtap="submit">完成</view>
+  </view>
+
+  <view class="wrap">
+    <view class="add-types">
+      <view class="add-type {{inputType === 'text' ? 'on' : ''}}" data-type="text" bindtap="onType">快速粘贴</view>
+      <view class="add-type {{inputType === 'link' ? 'on' : ''}}" data-type="link" bindtap="onType">链接捕捞</view>
+      <view class="add-type {{inputType === 'image' ? 'on' : ''}}" data-type="image" bindtap="onType">截图灵感</view>
+      <view class="add-type {{inputType === 'spark' ? 'on' : ''}}" data-type="spark" bindtap="onType">灵感一句</view>
+    </view>
+
+    <view class="ghost" style="margin-bottom:16rpx;text-align:center" bindtap="pasteClipboard">从剪贴板粘贴</view>
+
+    <view wx:if="{{inputType === 'image'}}" class="add-field" bindtap="pickImage">
+      <text wx:if="{{!imagePath}}">点击选择图片，并补充说明</text>
+      <image wx:else src="{{imagePath}}" mode="widthFix" style="width:100%;border-radius:12rpx" />
+    </view>
+    <textarea
+      wx:else
+      class="add-field {{focused ? 'focus' : ''}}"
+      value="{{text}}"
+      bindinput="onText"
+      bindfocus="onFocus"
+      bindblur="onBlur"
+      auto-height
+      maxlength="-1"
+      placeholder="{{placeholder}}"
+      placeholder-style="color:rgba(42,46,55,0.35)"
+    />
+
+    <view class="chiprow" style="margin-top:24rpx">
+      <view wx:for="{{suggestTags}}" wx:key="*this"
+        class="chip interest {{selectedTags.indexOf(item) >= 0 ? 'on' : ''}}"
+        data-tag="{{item}}" bindtap="toggleTag">{{item}}</view>
+    </view>
+
+    <view class="btn-cinnabar {{loading ? 'press' : ''}}" hover-class="press" bindtap="submit">
+      {{loading ? '落墨中…' : '落笔收录'}}
+    </view>
+    <view class="type-caption" style="text-align:center;margin-top:20rpx">闲聊会自动过滤，有效信号进入灵感墙</view>
+  </view>
+</view>

@@ -1,0 +1,38 @@
+<page-meta root-class="{{themeDark ? 'theme-dark' : ''}}" background-color="{{themeDark ? '#15171C' : '#F7F5F2'}}" />
+<view class="page-texture"></view>
+
+<import src="../../templates/masonry-card.wxml" />
+
+<view class="welcome-bar glass-bar" style="padding-top:{{navPadTop}}px;padding-right:{{navPadRight}}px">
+  <view class="detail-nav-back" bindtap="onBack">‹ 返回</view>
+  <view class="type-title" style="margin-top:8rpx">{{tagName}} · 小专辑</view>
+  <view class="welcome-sub">共 {{meta.total}} 条 · 收藏 {{meta.savedCount}}{{meta.trend ? ' · ' + meta.trend : ''}}</view>
+</view>
+
+<view class="wrap tabpage">
+  <view wx:if="{{meta.recent.length}}" class="explore-block glass" style="padding:20rpx;border-radius:24rpx;margin-bottom:24rpx">
+    <view class="explore-title">最近新增</view>
+    <view wx:for="{{meta.recent}}" wx:key="id" class="bias-line" data-id="{{item.id}}" bindtap="onCardTap">
+      · {{item.title}}
+    </view>
+  </view>
+
+  <view wx:if="{{leftCol.length || rightCol.length}}" class="masonry">
+    <view class="masonry-col">
+      <block wx:for="{{leftCol}}" wx:key="id">
+        <template is="masonryCard" data="{{c: item}}" />
+      </block>
+    </view>
+    <view class="masonry-col">
+      <block wx:for="{{rightCol}}" wx:key="id">
+        <template is="masonryCard" data="{{c: item}}" />
+      </block>
+    </view>
+  </view>
+
+  <view wx:else class="empty">
+    <view class="firefly-empty-glow"></view>
+    <view class="empty-title">此标签尚空</view>
+    <view class="small">收录更多内容后，专辑会自动丰满</view>
+  </view>
+</view>

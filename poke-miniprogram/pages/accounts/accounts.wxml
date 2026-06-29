@@ -1,0 +1,39 @@
+<page-meta root-class="{{themeDark ? 'theme-dark' : ''}}" background-color="{{themeDark ? '#15171C' : '#F7F5F2'}}" />
+<view class="page-texture"></view>
+
+<view class="welcome-bar glass-bar" style="padding-top:{{navPadTop}}px;padding-right:{{navPadRight}}px">
+  <view class="detail-nav-back" bindtap="onBack">‹ 返回</view>
+  <view class="type-title" style="margin-top:8rpx">公众号订阅</view>
+  <view class="welcome-sub">关注的公众号消息自动进流萤，全文内读，无需跳转</view>
+</view>
+
+<view class="wrap tabpage">
+  <view class="btn-cinnabar" bindtap="onSync">立即同步公众号</view>
+  <view class="type-caption mp-hint" style="margin:16rpx 8rpx 24rpx">
+    通过 WeWe-RSS 接入你在微信里关注的公众号。正文、时间、地点会完整提取到 App 内。
+  </view>
+
+  <view wx:if="{{configured.length}}" class="glass" style="padding:20rpx;border-radius:24rpx;margin-bottom:24rpx">
+    <view class="sec-title" style="margin-top:0">已接入</view>
+    <view wx:for="{{configured}}" wx:key="id" class="mp-row">
+      <view>
+        <view class="shelf-title">{{item.room}}</view>
+        <view class="type-caption">最近同步 {{item.lastCount || 0}} 条</view>
+      </view>
+      <view class="mp-status {{item.lastError ? 'err' : ''}}">{{item.lastError ? '异常' : '正常'}}</view>
+    </view>
+  </view>
+
+  <view class="sec-title">添加 RSS 源</view>
+  <view class="type-caption" style="margin:0 8rpx 12rpx">在 WeWe-RSS（{{weweBase}}）订阅公众号后，复制单源 RSS 粘贴下方</view>
+  <input class="note-inp glass" style="padding:16rpx;margin-bottom:12rpx" placeholder="RSS 链接" value="{{rssUrl}}" bindinput="onRssUrl" />
+  <input class="note-inp glass" style="padding:16rpx;margin-bottom:16rpx" placeholder="来源名，如：东华大学体育部" value="{{rssName}}" bindinput="onRssName" />
+  <view class="ghost" bindtap="onAddSource">添加并同步</view>
+
+  <view class="brush-rule"></view>
+  <view class="sec-title">推荐关注（截图里的号）</view>
+  <view class="explore-chips">
+    <view wx:for="{{suggested}}" wx:key="room" class="explore-chip" data-name="{{item.search}}" bindtap="copySearch">{{item.room}}</view>
+  </view>
+  <view class="type-caption" style="margin-top:12rpx">点击复制名称 → 微信搜公众号 → 在 WeWe-RSS 用文章链接添加</view>
+</view>

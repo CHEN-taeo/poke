@@ -1,11 +1,19 @@
+<view class="hero-strip">
+  <image class="hero-bg" src="/assets/hero-mist.svg" mode="aspectFill" />
+</view>
+
 <view class="wrap">
-  <view class="lead">从微信复制真实内容，或开启 wechat-cli 后把群消息「转发」到文件传输助手，会自动进破壳。</view>
+  <view class="type-hero" style="margin-bottom:8rpx">导入</view>
+  <view class="type-caption" style="margin-bottom:28rpx">粘贴班委群、社团群或峰会海报文字</view>
+
   <view class="field">
     <text class="label">来源（可选）</text>
-    <input class="inp" value="{{room}}" bindinput="onRoom" placeholder="文件传输助手 / 班级群名" />
+    <input class="inp" value="{{room}}" bindinput="onRoom" placeholder="班委群 / 社团群 / 文件传输助手" placeholder-style="color:#A39E97" />
   </view>
   <textarea class="ta" value="{{text}}" bindinput="onText" auto-height maxlength="-1"
-    placeholder="粘贴从微信复制的真实消息…&#10;例如：&#10;找搭子&#10;某某讲座今晚7点三教&#10;国家奖学金截止周四" />
-  <view class="primary" bindtap="submit">{{loading ? 'AI 整理中…' : '导入 → AI 整理'}}</view>
-  <view class="hint">导入后回到「今天」下拉刷新即可看到真实卡片。噪音（在吗/哈哈）会自动丢掉。</view>
+    placeholder="粘贴活动信息…&#10;&#10;峰会报名 6月30日截止&#10;讲座今晚 7 点 三教&#10;黑客松招募队友" placeholder-style="color:#A39E97" />
+  <view class="primary" bindtap="submit">{{loading ? 'AI 整理中…' : '导入'}}</view>
+
+  <view class="hint">导入后回到「今天」或「机会」下拉刷新。闲聊会自动过滤。</view>
+  <view class="hint wewe">公众号可全自动：本机 WeWe-RSS → RSS 写入流萤采集源</view>
 </view>

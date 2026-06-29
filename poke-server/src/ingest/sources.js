@@ -6,7 +6,13 @@ const FILE = path.join(__dirname, '..', '..', 'data', 'sources.json');
 function read() {
   try { return JSON.parse(fs.readFileSync(FILE, 'utf8')); } catch (e) { return null; }
 }
-function write(list) { fs.writeFileSync(FILE, JSON.stringify(list, null, 2)); }
+function write(list) {
+  try {
+    fs.writeFileSync(FILE, JSON.stringify(list, null, 2));
+  } catch (e) {
+    console.warn('[sources] 写盘失败（可能被占用）:', e.message);
+  }
+}
 
 // 首次无文件时给东华大学官网源（真实校园通知）
 function seedIfEmpty() {

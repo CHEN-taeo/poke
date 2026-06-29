@@ -1,0 +1,3 @@
+.detail-nav-back {
+  font-size: 30rpx; color: var(--ink-muted); padding: 8rpx 0;
+}

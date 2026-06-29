@@ -9,7 +9,10 @@ const mock = require('./ingest/mock');
 const { ingestOne, ingestMany } = require('./ingest/core');
 const { parse } = require('./ingest/parse');
 const sources = require('./ingest/sources');
+const aiSources = require('./ingest/ai-sources');
 const scheduler = require('./ingest/scheduler');
+const digest = require('./ai/digest');
+const askItem = require('./ai/askItem');
 
 const app = express();
 app.use(express.json({ limit: '1mb' }));
@@ -30,6 +33,7 @@ app.get('/api/health', async (req, res) => {
     ingestMode: process.env.INGEST_MODE || 'real',
     llm: llm.enabled() ? 'on' : 'off(规则引擎)',
     autoIngest: process.env.AUTO_INGEST === '1',
+    aiAutoIngest: process.env.AI_AUTO_INGEST === '1',
     wechatCli: process.env.WECHAT_CLI === '1',
     real: true
   };
@@ -44,17 +48,20 @@ app.get('/api/health', async (req, res) => {
 
 // 投喂一条真实消息
 app.post('/api/ingest', async (req, res) => {
-  const { text, room, sender, source, url } = req.body || {};
+  const { text, room, sender, source, url, lane, platform } = req.body || {};
   if (!text || !text.trim()) return res.status(400).json({ error: 'text 必填' });
-  const r = await ingestOne({ text, room, sender, source: source || 'forward', url });
+  const r = await ingestOne({ text, room, sender, source: source || 'forward', url, lane, platform });
   res.json(r);
 });
 
 // 粘贴一批真实消息（文件传输助手 / 群聊导出）
 app.post('/api/ingest/paste', async (req, res) => {
-  const { text, room, sender, mode } = req.body || {};
+  const { text, room, sender, mode, lane } = req.body || {};
   if (!text || !text.trim()) return res.status(400).json({ error: 'text 必填' });
-  const messages = parse(text, { room, sender, mode: mode || 'auto' });
+  const aiLane = lane === 'ai' || /【AI脉动投喂】/.test(text);
+  const messages = parse(text, { room, sender, mode: mode || 'auto' }).map(m =>
+    Object.assign({}, m, { lane: aiLane ? 'ai' : 'campus', source: aiLane ? 'ai' : m.source })
+  );
   if (!messages.length) return res.status(400).json({ error: '未能解析出任何消息' });
   const out = await ingestMany(messages);
   res.json(Object.assign({ parsed: messages.length }, out));
@@ -83,6 +90,37 @@ app.post('/api/sources', async (req, res) => {
 });
 app.post('/api/sources/remove', (req, res) => { sources.remove((req.body || {}).id); res.json({ ok: true }); });
 app.post('/api/poll', async (req, res) => res.json(await scheduler.pollAll())); // 手动触发一次全量抓取
+app.post('/api/poll-ai', async (req, res) => res.json(await scheduler.pollAi()));
+
+// ===== AI 采集源 =====
+app.get('/api/ai-sources', (req, res) => res.json(aiSources.list()));
+app.post('/api/ai-sources', async (req, res) => {
+  const { url, room, type, query, platform } = req.body || {};
+  if (!url && !query) return res.status(400).json({ error: '需要 url 或 query' });
+  const src = aiSources.add({
+    url: url ? url.trim() : '',
+    room: (room || '').trim(),
+    type: type || (query ? 'github' : 'rss'),
+    query: query || '',
+    platform: platform || type || 'rss',
+    lane: 'ai'
+  });
+  const poll = await scheduler.pollOne(src);
+  res.json({ source: aiSources.list().find(s => s.id === src.id), poll });
+});
+app.post('/api/ai-sources/remove', (req, res) => { aiSources.remove((req.body || {}).id); res.json({ ok: true }); });
+
+// AI 脉动视图
+app.get('/api/ai-pulse', (req, res) => res.json(modules.aiPulse(req.query.uid, req.query)));
+app.get('/api/ai-pulse/digest', (req, res) => {
+  const d = digest.get(req.query.week);
+  res.json(d || { week: digest.isoWeekKey(new Date()), title: '暂无周报', summary: '点击生成或等待每周一自动汇总', highlights: [] });
+});
+app.post('/api/ai-pulse/digest/generate', async (req, res) => {
+  const d = await digest.generate((req.body || {}).week);
+  res.json(d);
+});
+app.get('/api/ai-topics', (req, res) => res.json(modules.AI_TOPICS));
 
 // wechat-cli 群聊本地库
 app.get('/api/wechat-cli/status', async (req, res) => {
@@ -94,15 +132,56 @@ app.post('/api/wechat-cli/poll', async (req, res) => {
   res.json(await require('./ingest/wechat-cli').pollAll());
 });
 
-// 模块视图（带 ?uid= 时返回个人参与态 + 真实计数）
-app.get('/api/feed', (req, res) => res.json(modules.feed(req.query.uid)));
-app.get('/api/buddy', (req, res) => res.json(modules.buddy(req.query.uid)));
-app.get('/api/radar', (req, res) => res.json(modules.radar(req.query.uid)));
-app.get('/api/poke', (req, res) => res.json(modules.poke(req.query.uid)));
-app.get('/api/me', (req, res) => res.json(modules.mine(req.query.uid)));
+// 模块视图（带 ?uid= 时返回个人参与态 + 信息差）
+app.get('/api/feed', (req, res) => res.json(modules.feed(req.query.uid, req.query)));
+app.get('/api/buddy', (req, res) => res.json(modules.buddy(req.query.uid, req.query)));
+app.get('/api/radar', (req, res) => res.json(modules.radar(req.query.uid, req.query)));
+app.get('/api/poke', (req, res) => res.json(modules.poke(req.query.uid, req.query)));
+app.get('/api/gap', (req, res) => res.json(modules.gap(req.query.uid, req.query)));
+app.get('/api/calendar', (req, res) => res.json(modules.calendar(req.query.uid, req.query)));
+app.get('/api/me', (req, res) => res.json(modules.mine(req.query.uid, req.query)));
 app.get('/api/raw', (req, res) => res.json(store.raw().slice(0, 100)));
 app.get('/api/items', (req, res) => res.json(store.items()));
+app.get('/api/items/:id', (req, res) => {
+  const it = store.getItem(req.params.id);
+  if (!it) return res.status(404).json({ error: '条目不存在' });
+  res.json(store.enrich(it, req.query.uid, {}));
+});
 app.get('/api/stats', (req, res) => res.json(modules.stats()));
+
+// 运营：内幕标注 + 活动类型
+app.post('/api/items/:id/insider', (req, res) => {
+  const { insiderNote, eventType } = req.body || {};
+  const it = store.getItem(req.params.id);
+  if (!it) return res.status(404).json({ error: '条目不存在' });
+  const patch = {};
+  if (typeof insiderNote === 'string') patch.insiderNote = insiderNote.trim();
+  if (eventType) patch.eventType = eventType;
+  const updated = store.updateItem(req.params.id, patch);
+  res.json({ ok: true, item: store.enrich(updated, req.query.uid || req.body.uid) });
+});
+
+app.get('/api/event-types', (req, res) => res.json(modules.EVENT_TYPES));
+
+app.get('/api/mp-suggestions', (req, res) => {
+  try {
+    const fs = require('fs');
+    const path = require('path');
+    const f = path.join(__dirname, '..', 'data', 'wewe-feeds.template.json');
+    const t = JSON.parse(fs.readFileSync(f, 'utf8'));
+    const configured = sources.list().filter(s => s.wewe || /公众号/.test(s.room || ''));
+    res.json({
+      weweRssBase: t.weweRssBase,
+      suggested: t.suggestedAccounts || [],
+      configured: configured.map(s => ({
+        id: s.id, room: s.room, enabled: s.enabled !== false,
+        lastPoll: s.lastPoll, lastCount: s.lastCount, lastError: s.lastError || ''
+      }))
+    });
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
+});
 
 // 参与：多人"想去/找搭子/去过"计数同步
 app.post('/api/engage', (req, res) => {
@@ -112,6 +191,17 @@ app.post('/api/engage', (req, res) => {
   }
   const counts = store.setEngage(itemId, uid, name, action, value !== false);
   res.json({ ok: true, itemId, counts, mine: store.mineState(itemId, uid) });
+});
+
+app.post('/api/ask', async (req, res) => {
+  const { itemId, question, interests } = req.body || {};
+  if (!itemId || !question) return res.status(400).json({ error: '需要 itemId 与 question' });
+  try {
+    const out = await askItem.ask(itemId, question, interests);
+    res.json(out);
+  } catch (e) {
+    res.status(500).json({ error: e.message });
+  }
 });
 
 const PORT = process.env.PORT || 5700;
@@ -137,6 +227,12 @@ async function bootIngest() {
   if (process.env.AUTO_INGEST === '1') {
     scheduler.start(process.env.AUTO_INTERVAL_MIN);
   } else {
-    console.log('[auto] 自动采集未开启（.env 设 AUTO_INGEST=1 开启）');
+    console.log('[auto] 校园自动采集未开启（.env 设 AUTO_INGEST=1）');
+  }
+  if (process.env.AI_AUTO_INGEST === '1') {
+    scheduler.startAiIngest(process.env.AI_AUTO_INTERVAL_MIN);
+    scheduler.scheduleWeeklyDigest();
+  } else {
+    console.log('[auto] AI 采集未开启（.env 设 AI_AUTO_INGEST=1）');
   }
 }

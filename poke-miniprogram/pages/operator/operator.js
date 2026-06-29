@@ -1,10 +1,9 @@
 const store = require('../../utils/store.js');
-const CATS = ['活动', '搭子', '通知', '资源'];
+const CATS = ['活动', '通知', '机会', '资源'];
 
 Page({
   data: {
-    k: { go: 0, buddy: 0, attended: 0, reflected: 0 },
-    shown: 0, ctr: 0,
+    shown: 0,
     items: [], pokeId: '', pokeTitle: '',
     cats: CATS, catIndex: 0,
     showEdit: false,
@@ -18,14 +17,9 @@ Page({
     const t = store.todayStr();
     const items = (S.days[t] || []);
     const poke = S.pokeOfDay[t];
-    const distinct = Object.keys(S.eng).filter(id => S.eng[id].go).length;
-    const attended = Object.values(S.eng).filter(x => x.attended).length;
-    const reflected = Object.keys(S.reflect).filter(id => S.reflect[id].text).length;
     const shown = store.todayItems(S).length;
-    const ctr = shown ? Math.round(distinct / shown * 100) : 0;
     this.setData({
-      k: { go: S.log.goClicks, buddy: S.log.buddyClicks, attended, reflected },
-      shown, ctr,
+      shown,
       items, pokeId: poke ? poke.id : '', pokeTitle: poke ? poke.title : ''
     });
   },
@@ -111,5 +105,6 @@ Page({
   },
 
   closeEdit() { this.setData({ showEdit: false }); },
+  goInsider() { wx.navigateTo({ url: '/pages/insider/insider' }); },
   noop() {}
 });

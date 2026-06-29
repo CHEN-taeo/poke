@@ -1,3 +1,9 @@
+const theme = require('./utils/theme.js');
+
 App({
-  globalData: {}
+  globalData: { themeMode: 'light' },
+  onLaunch() {
+    const mode = theme.getMode();
+    this.globalData.themeMode = mode;
+  }
 });

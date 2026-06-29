@@ -1,0 +1,20 @@
+<template name="masonryCard">
+  <view
+    class="masonry-card {{c.masonryTall ? 'tall' : ''}} {{c.poke ? 'poke' : ''}} {{c.enterClass || ''}}"
+    hover-class="glass-press"
+    hover-stay-time="120"
+    bindtap="onCardTap"
+    data-id="{{c.id}}"
+  >
+    <image class="masonry-cover" src="{{c.thumbSrc}}" mode="aspectFill" />
+    <view class="masonry-body">
+      <view class="seal-chip {{c.poke ? 'poke' : ''}}" style="{{c.chipStyle}}">{{c.poke ? c.pokeChip : (c.aiTopic || c.eventType || c.cat)}}</view>
+      <rich-text wx:if="{{c.titleNodes}}" class="masonry-title" nodes="{{c.titleNodes}}" />
+      <view wx:else class="masonry-title">{{c.title}}</view>
+      <view class="masonry-summary">{{c.summary}}</view>
+      <view wx:if="{{c.deadline}}" class="masonry-meta ochre">{{c.deadline}}</view>
+      <view wx:elif="{{c.time}}" class="masonry-meta">{{c.time}}</view>
+      <view wx:elif="{{c.place}}" class="masonry-meta">{{c.place}}</view>
+    </view>
+  </view>
+</template>

@@ -1,4 +1,5 @@
 {
   "usingComponents": {},
-  "navigationBarTitleText": "导入真实消息"
+  "navigationStyle": "custom",
+  "backgroundColor": "#F5F0E8"
 }

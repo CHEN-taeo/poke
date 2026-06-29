@@ -1,14 +1,12 @@
 <view class="wrap">
-  <view class="lead">手动录入今天值得做的 3 件事（MVP 阶段不用 AI，先验证「学生会不会真的行动」）。</view>
+  <view class="lead">手动录入或查看采集概况（连接后端时以服务端数据为准）。</view>
 
   <view class="kpis">
-    <view class="kpi"><view class="kpi-inner"><view class="v">{{k.go}}</view><view class="l">「想去」总点击 · 行动信号</view></view></view>
-    <view class="kpi"><view class="kpi-inner"><view class="v">{{k.buddy}}</view><view class="l">「找搭子」点击 · 连接信号</view></view></view>
-    <view class="kpi"><view class="kpi-inner"><view class="v">{{k.attended}}</view><view class="l">标记「去过」· 真实到场</view></view></view>
-    <view class="kpi"><view class="kpi-inner"><view class="v">{{k.reflected}}</view><view class="l">写了复盘 · 成长闭环</view></view></view>
+    <view class="kpi"><view class="kpi-inner"><view class="v">{{shown}}</view><view class="l">今日展示条目</view></view></view>
+    <view class="kpi"><view class="kpi-inner"><view class="v">{{items.length}}</view><view class="l">本机录入条数</view></view></view>
   </view>
 
-  <view class="hint">📊 <text class="b">最该盯的一个数：到场率。</text>「想去」很便宜，<text class="b">真去 + 复盘</text>才证明需求是真的。本机演示：精选 {{shown}} 条 → 想去转化 {{ctr}}%。真要验证，请把这个小程序发给一个班/社团，看真实的人会不会点、会不会去。</view>
+  <view class="hint">流萤专注<text class="b">信息收集与 AI 整理</text>。真实数据来自官网采集、RSS 与「导入」投喂；下拉各 Tab 可刷新。</view>
 
   <view class="sec-title" style="margin-left:0">今天的条目</view>
   <view class="opitem" wx:for="{{items}}" wx:key="id">
@@ -24,13 +22,14 @@
 
   <view class="opitem" style="border-style:dashed">
     <view>
-      <view class="t">🌱 破壳卡（圈外内容）</view>
+      <view class="t">破壳卡（圈外内容）</view>
       <view class="s">{{pokeTitle || '未设置'}}</view>
     </view>
     <view class="e" data-id="{{pokeId}}" bindtap="openEdit">{{pokeId ? '编辑' : '设置'}}</view>
   </view>
 
-  <view class="primary" data-id="__new" bindtap="openEdit">＋ 新增一条</view>
+  <view class="primary" data-id="__new" bindtap="openEdit">新增一条</view>
+  <view class="ghost" bindtap="goInsider">服务端内幕标注</view>
   <view class="ghost" bindtap="resetData">重置为示例数据</view>
 </view>
 
@@ -39,7 +38,7 @@
   <view class="mask" bindtap="closeEdit"></view>
   <view class="sheet" catchtap="noop">
     <view class="st">{{edit.isNew ? '新增' : '编辑'}}条目</view>
-    <view class="ssub">写得像「AI 帮你筛过」的口吻：一句人话摘要 + 为什么和 TA 有关。</view>
+    <view class="ssub">写得像 AI 帮你筛过的口吻：一句人话摘要 + 为什么值得关注。</view>
 
     <view class="field" wx:if="{{!edit.poke}}">
       <text class="label">分类</text>
@@ -50,25 +49,25 @@
 
     <view class="field">
       <text class="label">标题</text>
-      <input class="inp" data-field="title" value="{{edit.title}}" bindinput="onEditInput" placeholder="一眼能看懂的标题" placeholder-style="color:#6b7280" />
+      <input class="inp" data-field="title" value="{{edit.title}}" bindinput="onEditInput" placeholder="一眼能看懂的标题" placeholder-style="color:#AEAEB2" />
     </view>
     <view class="field">
       <text class="label">AI 摘要 / 人话说明</text>
-      <textarea class="ta" data-field="summary" value="{{edit.summary}}" bindinput="onEditInput" auto-height placeholder="这是什么、为什么值得、和你有什么关系" placeholder-style="color:#6b7280" />
+      <textarea class="ta" data-field="summary" value="{{edit.summary}}" bindinput="onEditInput" auto-height placeholder="这是什么、为什么值得、和你有什么关系" placeholder-style="color:#AEAEB2" />
     </view>
     <view class="field-row">
       <view class="field">
         <text class="label">时间</text>
-        <input class="inp" data-field="time" value="{{edit.time}}" bindinput="onEditInput" placeholder="今天 18:30" placeholder-style="color:#6b7280" />
+        <input class="inp" data-field="time" value="{{edit.time}}" bindinput="onEditInput" placeholder="今天 18:30" placeholder-style="color:#AEAEB2" />
       </view>
       <view class="field">
         <text class="label">地点</text>
-        <input class="inp" data-field="place" value="{{edit.place}}" bindinput="onEditInput" placeholder="三号楼报告厅" placeholder-style="color:#6b7280" />
+        <input class="inp" data-field="place" value="{{edit.place}}" bindinput="onEditInput" placeholder="三号楼报告厅" placeholder-style="color:#AEAEB2" />
       </view>
     </view>
     <view class="field">
       <text class="label">标签（逗号分隔）</text>
-      <input class="inp" data-field="tagsStr" value="{{edit.tagsStr}}" bindinput="onEditInput" placeholder="专业相关，别错过" placeholder-style="color:#6b7280" />
+      <input class="inp" data-field="tagsStr" value="{{edit.tagsStr}}" bindinput="onEditInput" placeholder="专业相关，别错过" placeholder-style="color:#AEAEB2" />
     </view>
 
     <view class="primary" bindtap="saveItem">保存</view>

@@ -1,0 +1,37 @@
+<import src="../../templates/hero.wxml" />
+<import src="../../templates/card.wxml" />
+
+<template is="hero" data="{{heroData}}" />
+
+<view class="wrap tabpage">
+  <view wx:if="{{digest}}" class="digest {{digestOpen ? 'open' : ''}}" bindtap="toggleDigest">
+    <view class="digest-hd">
+      <text class="digest-title">{{digest.title || '本周脉动'}}</text>
+      <text class="digest-toggle">{{digestOpen ? '收起' : '展开'}}</text>
+    </view>
+    <view wx:if="{{digestOpen}}" class="digest-body">{{digest.summary}}</view>
+  </view>
+
+  <view class="filterbar">
+    <picker mode="selector" range="{{filters}}" value="{{filterIndex}}" bindchange="onFilter">
+      <view class="filterpick">{{filters[filterIndex]}}</view>
+    </picker>
+    <view wx:if="{{online}}" class="pollbtn" bindtap="pollAi">{{polling ? '拉取中' : '拉新'}}</view>
+  </view>
+
+  <view class="card-group">
+    <view class="sec-title"><text class="n">{{items.length}}</text>脉动条目</view>
+    <block wx:if="{{items.length}}">
+      <view class="card-inset">
+        <block wx:for="{{items}}" wx:key="id">
+          <template is="card" data="{{c: item}}" />
+        </block>
+      </view>
+    </block>
+    <view wx:else class="empty">
+      <image class="empty-img" src="/assets/empty-signal.svg" mode="aspectFit" />
+      <view class="empty-title">{{online ? '暂无匹配条目' : '未连接后端'}}</view>
+      <view class="small">{{online ? '点「拉新」或粘贴 AI 链接到「导入」' : '启动 poke-server 后下拉刷新'}}</view>
+    </view>
+  </view>
+</view>

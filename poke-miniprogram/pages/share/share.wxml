@@ -1,0 +1,2 @@
+<canvas canvas-id="shareCanvas" style="width:375px;height:667px;position:fixed;left:-9999px" />
+<view class="wrap"><view class="lead">正在生成分享图…</view></view>

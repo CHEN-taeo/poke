@@ -1,0 +1,7 @@
+{
+  "navigationStyle": "custom",
+  "navigationBarTitleText": "AI脉动",
+  "enablePullDownRefresh": true,
+  "backgroundColor": "#F5F0E8",
+  "backgroundTextStyle": "light"
+}

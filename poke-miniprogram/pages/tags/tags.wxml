@@ -1,0 +1,32 @@
+<page-meta root-class="{{themeDark ? 'theme-dark' : ''}}" background-color="{{themeDark ? '#15171C' : '#F7F5F2'}}" />
+<view class="page-texture"></view>
+
+<view class="welcome-bar glass-bar" style="padding-top:{{navPadTop}}px;padding-right:{{navPadRight}}px">
+  <view class="welcome-brand">{{brandName}}</view>
+  <view class="type-title">印章谱</view>
+  <view class="welcome-sub">标签如藏书印，自成格局</view>
+</view>
+
+<view class="wrap tabpage">
+  <view wx:if="{{tags.length}}" class="tag-cloud">
+    <view
+      wx:for="{{tags}}"
+      wx:key="name"
+      class="tag-seal tier-{{item.tier}}"
+      style="{{item.style}}"
+      data-tag="{{item.name}}"
+      bindtap="onTagTap"
+      hover-class="glass-press"
+    >
+      {{item.name}}<text class="tag-count">{{item.count}}</text>
+    </view>
+  </view>
+
+  <view wx:else class="empty">
+    <view class="firefly-empty-glow"></view>
+    <image class="empty-img" src="/assets/empty-tags.svg" mode="aspectFit" />
+    <view class="empty-title">此处尚空，灵感待归</view>
+    <view class="small">收录内容后，标签会自然浮现</view>
+    <view class="btn-cinnabar" style="margin:32rpx 24rpx 0" bindtap="goAdd">去收录</view>
+  </view>
+</view>

@@ -1,5 +1,8 @@
 // 高校官网通知页抓取（树维 CMS news_list 结构，东华等通用）
 const { fetchFeed: fetchRss, parse: parseRss } = require('./rss');
+const { fetchHnStories } = require('./hn');
+const { fetchGithubRepos } = require('./github');
+const aiSources = require('./ai-sources');
 
 async function fetchText(url) {
   const res = await fetch(url, {
@@ -61,11 +64,14 @@ async function fetchWebList(url) {
   return parseSudyList(html, url);
 }
 
-/** 统一入口：rss 或 web */
+/** 统一入口：rss / web / hn / github */
 async function fetchSource(src) {
   const type = src.type || 'rss';
   if (type === 'web') return fetchWebList(src.url);
-  return fetchRss(src.url);
+  if (type === 'hn') return fetchHnStories(src.query || 'AI', src.limit || 12);
+  if (type === 'github') return fetchGithubRepos(src.query || 'AI agent', src.limit || 8);
+  const url = src.url && !/^https?:\/\//i.test(src.url) ? aiSources.resolveUrl(src) : src.url;
+  return fetchRss(url);
 }
 
-module.exports = { fetchWebList, fetchSource, parseSudyList, abs };
+module.exports = { fetchWebList, fetchSource, parseSudyList, abs, fetchText };

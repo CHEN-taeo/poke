@@ -1,29 +1,30 @@
 <template name="card">
-  <view class="card {{c.poke ? 'poke' : ''}}">
-    <view class="chiprow">
-      <view class="chip cat {{c.poke ? 'poke' : ''}}">{{c.poke ? '🌱 ' : ''}}{{c.cat}}</view>
-      <view wx:for="{{c.tags}}" wx:key="*this" class="chip">{{item}}</view>
-    </view>
-    <view class="h3">{{c.title}}</view>
-    <view class="summary">{{c.summary}}</view>
-    <view class="meta">
-      <text wx:if="{{c.time}}">🕒 {{c.time}}</text>
-      <text wx:if="{{c.place}}">📍 {{c.place}}</text>
-      <text wx:if="{{c.deadline}}" class="dl">⏰ {{c.deadline}}</text>
-      <text wx:if="{{c.price}}">💰 {{c.price}}</text>
-    </view>
-    <view wx:if="{{c.pokeReason}}" class="pokereason">🌱 {{c.pokeReason}}</view>
-    <view class="counts"><text class="hl">{{c.goN}}</text> 人想去 · <text class="hl">{{c.bdN}}</text> 人在找搭子</view>
-    <view class="actions">
-      <view class="btn btn-go {{c.go ? 'on' : ''}}" data-id="{{c.id}}" data-act="go" bindtap="onAct">{{c.go ? '✓ 已想去' : '想去 +1'}}</view>
-      <view class="btn btn-buddy {{c.buddy ? 'on' : ''}}" data-id="{{c.id}}" data-act="buddy" bindtap="onAct">{{c.buddy ? '✓ 找搭子中' : '找搭子'}}</view>
-    </view>
-    <view wx:if="{{c.buddy}}" class="buddies">
-      <block wx:if="{{c.names.length}}">一起的：<text wx:for="{{c.names}}" wx:key="*this" class="who">{{item}}</text></block>
-      <block wx:else>你是第一个，等人来组队～</block>
-      <view wx:if="{{c.go}}" class="attendwrap">
-        <view class="btn btn-go {{c.attended ? 'btn-active' : ''}}" data-id="{{c.id}}" data-act="attend" bindtap="onAct">{{c.attended ? '✓ 已标记去过 → 去复盘' : '我去过了 / 标记完成'}}</view>
+  <view class="card {{c.poke ? 'poke' : ''}} {{c.enterClass || ''}}" hover-class="card-press" hover-stay-time="80" bindtap="onCardTap" data-id="{{c.id}}">
+    <view class="card-row">
+      <view class="card-thumb-wrap">
+        <image class="card-thumb" src="{{c.thumbSrc}}" mode="aspectFill" />
       </view>
+      <view class="card-main">
+        <view class="gaprow" wx:if="{{c.gapReasons.length || c.insiderNote}}">
+          <image wx:if="{{c.gapReasons.length}}" class="seal-icon" src="/assets/seal-dot.svg" mode="aspectFit"/>
+          <view wx:for="{{c.gapReasons}}" wx:key="*this" class="gapchip gap-{{index}}">{{item}}</view>
+          <view wx:if="{{c.insiderNote}}" class="gapchip gap-insider">内幕</view>
+        </view>
+        <view class="chiprow">
+          <view class="chip cat {{c.poke ? 'poke' : ''}}" style="{{c.chipStyle}}">{{c.poke ? c.pokeChip + ' · ' : ''}}{{c.aiTopic || c.eventType || c.cat}}</view>
+          <view wx:if="{{c.platform}}" class="chip plat">{{c.platform}}</view>
+        </view>
+        <view class="h3">{{c.title}}</view>
+        <view class="summary card-summary">{{c.summary}}</view>
+        <view class="meta card-meta">
+          <view wx:if="{{c.time}}" class="meta-item"><text class="meta-val">{{c.time}}</text></view>
+          <view wx:if="{{c.deadline}}" class="meta-item"><text class="meta-val dl dl-{{c.deadlineTier || 'unknown'}}">{{c.deadline}}</text></view>
+        </view>
+        <view class="card-more">查看详情 ›</view>
+      </view>
+    </view>
+    <view class="actions" wx:if="{{c.url}}">
+      <view class="btn btn-link btn-full" data-id="{{c.id}}" data-act="copylink" data-url="{{c.url}}" catchtap="onAct">复制原文链接</view>
     </view>
   </view>
 </template>

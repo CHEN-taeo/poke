@@ -1,0 +1,36 @@
+<view class="wrap">
+  <view class="lead">为服务端条目添加<strong>内幕/经验</strong>（个人体验，仅供参考），提升信息差分数。</view>
+  <view wx:if="{{!online}}" class="empty">
+    <view class="big">💎</view>未连接 poke-server
+    <view class="small">启动后端后下拉刷新</view>
+  </view>
+  <block wx:else>
+    <view class="opitem" wx:for="{{items}}" wx:key="id">
+      <view>
+        <view class="t">{{item.eventType || item.cat}} · {{item.title}}</view>
+        <view class="s">{{item.insiderNote || '暂无内幕'}}</view>
+      </view>
+      <view class="e" data-id="{{item.id}}" bindtap="openEdit">标注</view>
+    </view>
+  </block>
+</view>
+
+<view wx:if="{{showEdit}}">
+  <view class="mask" bindtap="closeEdit"></view>
+  <view class="sheet" catchtap="noop">
+    <view class="st">内幕标注</view>
+    <view class="ssub">{{edit.title}}</view>
+    <view class="field">
+      <text class="label">活动类型</text>
+      <picker mode="selector" range="{{eventTypes}}" value="{{edit.eventIndex}}" bindchange="onEventType">
+        <view class="picker">{{eventTypes[edit.eventIndex]}}</view>
+      </picker>
+    </view>
+    <view class="field">
+      <text class="label">内幕 / 经验（如：值得投 / 讲座偏水）</text>
+      <textarea class="ta" value="{{edit.insiderNote}}" bindinput="onInsiderInput" auto-height placeholder="个人体验，仅供参考" placeholder-style="color:#6b7280" />
+    </view>
+    <view class="primary" bindtap="saveInsider">保存</view>
+    <view class="ghost" bindtap="closeEdit">取消</view>
+  </view>
+</view>

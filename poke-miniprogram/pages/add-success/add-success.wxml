@@ -1,0 +1,27 @@
+<page-meta root-class="{{themeDark ? 'theme-dark' : ''}}" background-color="{{themeDark ? '#15171C' : '#F7F5F2'}}" />
+<view class="page-texture"></view>
+
+<view class="welcome-bar glass-bar" style="padding-top:{{navPadTop}}px;padding-right:{{navPadRight}}px">
+  <view class="welcome-brand">{{brandName}}</view>
+  <view class="type-title">已拾起一点光</view>
+  <view class="welcome-sub">内容已整理成卡片</view>
+</view>
+
+<view class="wrap tabpage">
+  <view class="firefly-empty-glow"></view>
+
+  <view wx:if="{{card}}" class="success-card glass firefly-brief">
+    <view class="success-label">变成的卡片</view>
+    <view class="chiprow" style="margin-bottom:12rpx">
+      <view class="chip cat" style="{{card.chipStyle}}">{{card.cat}}</view>
+      <view wx:for="{{card.tags}}" wx:key="*this" class="chip">{{item}}</view>
+    </view>
+    <view class="type-title" style="font-size:34rpx">{{card.title}}</view>
+    <view class="type-body" style="margin-top:12rpx">{{card.summary}}</view>
+    <view wx:if="{{card.deadline}}" class="type-caption" style="margin-top:12rpx;color:var(--accent)">截止 {{card.deadline}}</view>
+  </view>
+
+  <view class="btn-cinnabar" bindtap="goDetail">查看详情</view>
+  <view class="ghost" style="margin-top:20rpx" bindtap="goHome">回到首页</view>
+  <view class="ghost" style="margin-top:16rpx" bindtap="goAdd">继续捕捞</view>
+</view>
